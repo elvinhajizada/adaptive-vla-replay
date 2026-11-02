@@ -34,7 +34,7 @@ def load_policy(path: Optional[str] = None, device: str = "cpu") -> Tuple[Any, A
 
     path=None loads θ0; otherwise a full (not slim) checkpoint dir, built with θ0's config. The
     preprocessor is always θ0's: fine-tunes keep θ0's normalizer stats (checked per checkpoint by
-    scripts/check_normalizer.py). Same calls as experiments/m1/eval_parity.py, which matched lerobot-eval.
+    scripts/check_normalizer.py). Same calls as experiments/setup/eval_parity.py, which matched lerobot-eval.
     """
     from lerobot.configs.policies import PreTrainedConfig
     from lerobot.policies.factory import make_pre_post_processors

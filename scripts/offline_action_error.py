@@ -17,7 +17,7 @@ Usage: python scripts/offline_action_error.py [--csv=OUT.csv] [--frames=NAME=JSO
            LABEL=POLICY_DIR [...]   (θ0 always included)
 --csv also writes the table as CSV (same columns as results/offline_action_error.csv, minus job).
 --frames adds a frame set of the merged replay dataset (libero_all_theta0, θ0 conventions): JSON is a
-  list of [row index, episode end row, instruction] (experiments/m2/buffer_memorization.py, E44);
+  list of [row index, episode end row, instruction] (experiments/replay/buffer_memorization.py, E44);
   --only-frames drops the four fixed sets above.
 POLICY_DIR may be slim (adaptive_vla.checkpoints); it is materialized to a temp dir and removed.
 """

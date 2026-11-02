@@ -170,8 +170,10 @@ task keeps about one demo's worth of frames and a LIBERO-10 task, whose demos ar
 about half. At the last stage the buffer holds 616 frames at 0.2%, 6,160 at 2% and 305,311 with every
 frame, counting the earlier new tasks. A stage runs 8 passes over the new task's frames whether or not
 it replays, and with half of each batch given to replay that takes twice the optimizer steps (a
-confound we return to in section 6). One seed value sets both the buffer draw and the training
-randomness; runs at different budgets share seed values but not buffers, so they are not paired.
+confound we return to in section 6). The buffer draw and the training randomness have separate
+seeds, which every run changes together (seed 1 is buffer seed 0 with training seed 1000, seed 2 is
+1 and 1001, seed 3 is 2 and 1002); runs at different budgets share seed values but not buffers, so
+they are not paired.
 
 ### 2.5 Evaluation
 
@@ -460,7 +462,7 @@ high-loss region of the old task [12].
 
 At 0.2%, the seed moves the final success by up to 23 pts, several times the evaluation noise. The
 three 0.2% seeds end at 14, 19.5 and 37% on Spatial and at 13, 28 and 31% on Goal (SD 12 and 10
-pts), while a 200-episode probe carries about ±5 pts of episode noise. A seed value sets both which
+pts), while a 200-episode probe carries about ±5 pts of episode noise. Each seed changes both which
 frames the buffer holds and the training randomness, so we cannot say which of the two moves the
 result; the distinction matters for any method that chooses the buffer's frames. Measured across the
 three seeds, the 95% interval of the 0.2% mean runs from 0 to about 0.7 of θ0 on Spatial and to
@@ -532,7 +534,7 @@ LIBERO's fixed initial layouts. LIBERO-Object is not probed. Retention here is r
 in-distribution behaviour, not of skill under new layouts or instructions.
 
 Seeds are few. The no-replay sequence has one seed, 2% and every frame two, 0.2% three, and the
-split by task length one. One seed value sets both the buffer and the training randomness,
+split by task length one. Each seed changes both the buffer and the training randomness,
 so the two sources of spread are not separated, and the learning cost is measured against references
 that share one training seed. Replay stages take twice the optimizer steps of no-replay stages,
 which would, if anything, add forgetting under replay.
@@ -593,10 +595,10 @@ across tasks and methods that need no stored data.
   dataset). As decoded observations that is 0.24, 2.4 and 120 GB; the dataset's compressed video
   takes far less.
 - **Rerunning.** Environment and assets: the README. A replay sequence:
-  `experiments/m2/er_seed_chain.sh K BUFFER_SEED TRAINING_SEED`; a single-task fine-tune:
+  `experiments/replay/er_seed_chain.sh K BUFFER_SEED TRAINING_SEED`; a single-task fine-tune:
   `scripts/finetune_eval.sh`; probes: `scripts/probe_eval.sbatch`. Tables and figures:
-  `scripts/collect_results.py`, `experiments/m2/m2_metrics_ci.py`, `experiments/m2/m2_task_analysis.py`,
-  `experiments/m2/phase_coverage.py`, `experiments/m2/step_conditional.py`, `scripts/make_figures.py`. Every number in this report traces to a row of `results/*.csv`, except a
+  `scripts/collect_results.py`, `experiments/replay/metrics_ci.py`, `experiments/replay/task_analysis.py`,
+  `experiments/replay/phase_coverage.py`, `experiments/replay/step_conditional.py`, `scripts/make_figures.py`. Every number in this report traces to a row of `results/*.csv`, except a
   few computed directly from per-episode evaluation outputs or dataset metadata, which are not in the
   repository: the paired render-size test, the agreement between repeated evaluations, and frame
   counts. For each section, `results/README.md` lists the experiment ids, the launcher and the
@@ -629,13 +631,13 @@ the final average over the five new tasks (%). Source: `results/m2_metrics_ci.cs
 |---|---|---|---|---|---|---|
 | none | 1 | 0 (of 100) | 0 (of 100) | 0 (of 60) | 0.72 [0.66, 0.77] | 17 |
 | 0.2% | 1 | 37 [31, 42.5] | 13 [9, 17] | 0 | 0.39 [0.31, 0.46] | 26 |
-| 0.2% | 2 | 19.5 [15, 24] | 28 [23.5, 32] | 0 | 0.51 [0.43, 0.59] | 14 |
-| 0.2% | 3 | 14 [10, 18.5] | 31 [26, 36] | 3 [1, 6] | 0.46 [0.38, 0.53] | 28 |
-| 2% | 1 | 59 [52.5, 65] | 54.5 [48, 60.5] | 15 [10, 21] | 0.29 [0.20, 0.37] | 55 |
-| 2% | 2 | 63.5 [57.5, 69] | 64 [58.5, 69.5] | 15 [9, 20] | 0.26 [0.18, 0.34] | 58 |
-| every frame | 1 | 75.5 [70, 80.5] | 74 [68, 79.5] | 53 [45, 60] | 0.21 [0.12, 0.30] | 60 |
-| every frame | 2 | 71 [64.5, 77] | 69.5 [64, 75] | 52 [45, 59] | 0.17 [0.08, 0.26] | 60 |
-| 2%, split by task length | 1 | 57 [51, 63.5] | 56.5 [51, 62] | 29 [21, 36] | not measured | not measured |
+| 0.2% | 2 | 19.5 [15, 24] | 28 [24, 32] | 0 | 0.51 [0.43, 0.59] | 14 |
+| 0.2% | 3 | 14 [10, 18.5] | 31 [26, 36] | 3 [1, 7] | 0.46 [0.38, 0.53] | 28 |
+| 2% | 1 | 59 [52.5, 65] | 54.5 [48.5, 61] | 15 [10, 20] | 0.29 [0.20, 0.37] | 55 |
+| 2% | 2 | 63.5 [57.5, 69] | 64 [58, 69.5] | 15 [9, 20] | 0.26 [0.18, 0.34] | 58 |
+| every frame | 1 | 75.5 [70, 80.5] | 74 [68.5, 79] | 53 [45, 59] | 0.21 [0.12, 0.30] | 60 |
+| every frame | 2 | 71 [64.5, 77] | 69.5 [63.5, 75] | 52 [45, 59] | 0.17 [0.08, 0.26] | 60 |
+| 2%, split by task length | 1 | 57 [50.5, 63] | 56.5 [51, 62] | 29 [22, 35] | not measured | not measured |
 
 Retention of the seed mean, Spatial / Goal / LIBERO-10, with 95% intervals that resample θ0's episodes
 too: 0.2% 0.32 [0.28, 0.37] / 0.31 [0.28, 0.35] / 0.02 [0.00, 0.04]; 2% 0.83 [0.75, 0.93] / 0.77
@@ -650,9 +652,9 @@ learning cost against the no-replay reference (pts, 95% interval over episodes).
 | | Task 26 | Task 18 | Task 23 | Task 27 | Task 34 | Mean cost |
 |---|---|---|---|---|---|---|
 | no-replay reference | 88 | 82 | 45 | 73 | 87 | |
-| 0.2% | 93 | 65 | 55 | 41 | 72 | -9.9 [-14.5, -5.2] |
-| 2% | 92 | 75 | 52 | 57 | 86 | -2.6 [-7.8, 2.8] |
-| every frame | 93 | 79 | 52 | 65 | 84 | -0.4 [-5.6, 5.0] |
+| 0.2% | 93 | 65 | 55 | 41 | 72 | -9.9 [-14.9, -5.1] |
+| 2% | 92 | 75 | 52 | 57 | 86 | -2.6 [-8.0, 2.4] |
+| every frame | 93 | 79 | 52 | 65 | 84 | -0.4 [-5.6, 4.6] |
 
 ![Success matrices](figures/fig10_m2_matrices.png)
 

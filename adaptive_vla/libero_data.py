@@ -1,23 +1,23 @@
-"""Convert the nvidia LIBERO-90 split to theta0's conventions (docs/LIBERO.md, section 5).
+"""Convert the nvidia LIBERO-90 split to θ0's conventions (docs/LIBERO.md, section 5).
 
-nvidia/LIBERO_LeRobot_v3 holds the same demos as lerobot/libero (theta0's training set),
+nvidia/LIBERO_LeRobot_v3 holds the same demos as lerobot/libero (θ0's training set),
 but with different conventions. Training on it unconverted fails silently, so this writes
 a converted LeRobot v3 dataset:
 
   1. wrist camera key  observation.images.wrist_image -> observation.images.image2
-  2. gripper action    nvidia 1 open / 0 close -> theta0 -1 open / +1 close: g' = 1 - 2g
+  2. gripper action    nvidia 1 open / 0 close -> θ0 -1 open / +1 close: g' = 1 - 2g
   3. drop              observation.states.* (duplicates of observation.state)
-  4. stats.json        action / observation.state mean+std = theta0's normalizer stats.
+  4. stats.json        action / observation.state mean+std = θ0's normalizer stats.
                        lerobot-train (pinned 9a6bb61, lerobot_train.py:533,556-558) overwrites
                        a pretrained policy's normalizer with dataset.meta.stats when
-                       fine-tuning, so the dataset must carry theta0's stats, or every stage
-                       re-normalises theta0 and old skills drift (fake forgetting).
+                       fine-tuning, so the dataset must carry θ0's stats, or every stage
+                       re-normalises θ0 and old skills drift (fake forgetting).
 
 Videos are not re-encoded: the converted root symlinks the source video dirs under the
 new key. Parquet is rewritten (small). Select tasks at train time with --dataset.episodes.
 
 The pure functions here (gripper, stats, column / feature mapping) are unit-tested on CPU in
-tests/test_libero_data.py. convert() does file I/O; run it in a Slurm job, not on the login node.
+tests/test_libero_data.py. convert() does file I/O; run it in a batch job, not on a shared login host.
 """
 import json
 import math
@@ -36,7 +36,7 @@ GRIPPER = 6                     # index of the gripper in the 7-d action
 
 # --------------------------------------------------------------------------- pure helpers
 def gripper_to_theta0(g: np.ndarray) -> np.ndarray:
-    """nvidia gripper (1 open, 0 close) -> theta0 convention (-1 open, +1 close)."""
+    """nvidia gripper (1 open, 0 close) -> θ0 convention (-1 open, +1 close)."""
     g = np.asarray(g)
     if not np.isin(g, (0.0, 1.0)).all():
         bad = np.unique(g[~np.isin(g, (0.0, 1.0))])[:5]
@@ -87,7 +87,7 @@ def convert_stats(src_stats: Dict[str, dict], theta0: Dict[str, np.ndarray]) -> 
     """Dataset stats.json for the converted root.
 
     Keys renamed/dropped, gripper stats transformed, then mean/std of action and
-    observation.state replaced by theta0's normalizer values (the only stats theta0's
+    observation.state replaced by θ0's normalizer values (the only stats θ0's
     MEAN_STD normalizer reads; VISUAL features are IDENTITY).
     """
     out = {}
@@ -207,7 +207,7 @@ def task_index_for_instruction(dst_root: str, instruction: str) -> int:
 def steps_for_passes(passes: float, frames: int, batch_size: int) -> int:
     """Training steps for `passes` passes over `frames` frames at `batch_size` (rounded up).
 
-    M2 protocol (fixed 2026-10-22): each task trains for a fixed number of passes over its own
+    Replay-run protocol (fixed 2026-10-22): each task trains for a fixed number of passes over its own
     demos, not a fixed step count, so step counts differ by task.
     """
     if passes <= 0 or frames <= 0 or batch_size <= 0:

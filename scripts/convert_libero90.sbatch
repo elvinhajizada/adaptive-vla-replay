@@ -1,7 +1,7 @@
 #!/bin/bash
-# M1 data conversion: convert nvidia LIBERO-90 to theta0 conventions + verify. CPU only.
+# Data conversion: convert nvidia LIBERO-90 to θ0 conventions + verify. CPU only.
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-convert
 #SBATCH --partition=<your-partition>
 #SBATCH --cpus-per-task=4

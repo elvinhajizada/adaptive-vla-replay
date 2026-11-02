@@ -3,7 +3,7 @@
 # demo frames, vs θ0 and vs the demos. Body: scripts/offline_action_error.py.
 # Usage: sbatch scripts/offline_action_error.sbatch LABEL=POLICY_DIR [...]
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-offline-err
 #SBATCH --partition=<your-partition>
 #SBATCH --cpus-per-task=32

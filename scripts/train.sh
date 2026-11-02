@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-command fine-tune of theta0 on LIBERO-90 task(s) from the converted dataset (pinned lerobot-train).
+# One-command fine-tune of θ0 on LIBERO-90 task(s) from the converted dataset (pinned lerobot-train).
 #
 # Usage: bash scripts/train.sh TASK_INDICES STEPS [SAVE_FREQ] [BATCH]
 #   TASK_INDICES  nvidia task_index list, e.g. "[12]" or "[3,7]" (episodes are looked up)
@@ -9,18 +9,18 @@
 # Env var AVLA_LR=<peak lr> overrides θ0's peak LR (1e-4); the final LR scales with it
 # (peak / 40, θ0's ratio 1e-4 : 2.5e-6), so the schedule keeps its shape. Unset = θ0's recipe.
 # Env var AVLA_LOSS_DIMS=arm|grip supervises only those action dims (scripts/masked_train.py; E26).
-# Env var AVLA_REPLAY_SPEC=<spec.json> trains with experience replay (scripts/replay_train.py, M2):
+# Env var AVLA_REPLAY_SPEC=<spec.json> trains with experience replay (scripts/replay_train.py):
 #   the data becomes the merged libero_all_theta0, TASK_INDICES is ignored (pass "-"), and the
 #   spec decides every batch; AVLA_SAVE_STEPS=a,b,... keeps checkpoints at those steps only.
 # Env vars AVLA_WARM_ADAM=<N> (N zero-LR updates on θ0's data first, so Adam starts warm) and
 # AVLA_STOP_STEP=<S> (stop after the step-S checkpoint) run scripts/optim_train.py (E35).
-# Env var AVLA_SEED overrides the training seed (default 1000; the M2 seeds vary it).
+# Env var AVLA_SEED overrides the training seed (default 1000; the replay seeds vary it).
 # Env var AVLA_INIT starts from a checkpoint instead of θ0; AVLA_TRAIN_ARGS appends raw
 # lerobot-train arguments (plumbing only, e.g. "--policy.device=cpu" for a CPU smoke run).
 #
 # Recipe: SmolVLA defaults from the pinned LeRobot (action expert only, frozen vision,
 # AdamW lr 1e-4, 1k warmup, cosine decay to 30k). The data is libero90_theta0, which carries
-# theta0's normalizer stats (docs/LIBERO.md, section 5, step 4); scripts/check_normalizer.py
+# θ0's normalizer stats (docs/LIBERO.md, section 5, step 4); scripts/check_normalizer.py
 # verifies that every saved checkpoint still has them.
 # Output: $AVLA_RUNS/train/<run id>/ (lerobot output dir) + run_info.json + normalizer check.
 set -euo pipefail
@@ -31,7 +31,7 @@ BATCH="${4:-64}"
 SEED="${AVLA_SEED:-1000}"
 # Data workers: at most 8. 8 workers feed a batch every 0.18 s vs the 0.58 s a step takes, even
 # with three loaders at once (0.37 s); more workers only add spawn start-up and CPU contention
-# (experiments/m1/dataloader_bench.py, job 5683198, 2026-10-22).
+# (experiments/setup/dataloader_bench.py, job 5683198, 2026-10-22).
 WORKERS=$(( ${SLURM_CPUS_PER_TASK:-8} < 8 ? ${SLURM_CPUS_PER_TASK:-8} : 8 ))
 
 cd "${AVLA_REPO:-$(dirname "${BASH_SOURCE[0]}")/..}"
@@ -39,7 +39,7 @@ set +u; source scripts/env.sh; set -u
 THETA0="$HF_HOME/hub/models--HuggingFaceVLA--smolvla_libero/snapshots/$(python -c 'from adaptive_vla.config import Config; print(Config().pretrained_revision)')"
 RUN_ID="${SLURM_JOB_ID:-local-$(date +%Y%m%d-%H%M%S)}"
 OUT="$AVLA_RUNS/train/$RUN_ID"
-# Start policy: θ0 unless AVLA_INIT names a loadable checkpoint (the previous M2 stage, materialized).
+# Start policy: θ0 unless AVLA_INIT names a loadable checkpoint (the previous replay stage, materialized).
 INIT="${AVLA_INIT:-$THETA0}"
 
 if [ -n "${AVLA_REPLAY_SPEC:-}" ]; then

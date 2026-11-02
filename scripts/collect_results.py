@@ -8,28 +8,55 @@
   results/weight_drift.csv        relative L2 drift vs θ0 per module group (weight_drift.py)
   results/lang_diag.csv           language-diagnostic outcome rates per condition
   results/coverage_offline.csv    per replayed task and k: random vs greedy k-center coverage (E40)
-  results/coverage_buffers.csv    coverage of the actual M2 replay buffers (E40)
+  results/coverage_buffers.csv    coverage of the actual replay buffers of the sequences (E40)
   results/buffer_memorization.csv  offline error on buffered vs unbuffered frames per replay run (E44)
 
 Run ids are the output directory names (Slurm job id plus a label); paths are stored relative to
-$AVLA_RUNS, so the tables carry no machine-specific paths. Rerun after new jobs:
-  python scripts/collect_results.py          (needs LIBERO for task names: source scripts/env.sh)
+$AVLA_RUNS, so the tables carry no machine-specific paths. Rerun after new jobs (needs LIBERO for
+task names: source scripts/env.sh first):
+  python scripts/collect_results.py              writes results/, the committed tables
+  python scripts/collect_results.py --out DIR    writes DIR instead (your own runs, kept apart from ours)
+A table with no runs is skipped.
 """
+import argparse
 import csv
 import json
 import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pyarrow.parquet as pq
 from libero.libero.benchmark import get_benchmark_dict
 
-from adaptive_vla.libero_data import frames_for_tasks, task_index_for_instruction
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from adaptive_vla.libero_data import frames_for_tasks, task_index_for_instruction  # noqa: E402
 
 RUNS = Path(os.environ["AVLA_RUNS"])
 CONV = Path(os.environ["AVLA_DSS"]) / "data/libero90_theta0"
-OUT = Path("results")
+ap = argparse.ArgumentParser(description="Collect the runs under $AVLA_RUNS into CSV tables.")
+ap.add_argument("--out", default="results", help="output directory (default: results/, the committed tables)")
+OUT = Path(ap.parse_args().out)
+OURS = OUT.resolve() == Path("results").resolve()
+
+
+def slurm_log(job):
+    """A job's log: under $AVLA_RUNS, else in the current directory (the repository root, where a
+    launcher without a log path writes it)."""
+    p = RUNS / f"slurm-{job}.out"
+    return p if p.exists() else Path(f"slurm-{job}.out")
+
+
+def have(path):
+    """Inputs of our own offline analyses (fixed job ids): required when writing results/, skipped
+    when collecting someone else's runs into another directory."""
+    if path.exists():
+        return True
+    if OURS:
+        raise FileNotFoundError(path)
+    return False
+
 # Evals of a materialized (rebuilt-from-slim) checkpoint made before eval.sh recorded
 # `policy_source` (2026-10-23): the source checkpoint per run, from the sbatch scripts.
 MATERIALIZED = {
@@ -96,10 +123,10 @@ for info_path in sorted(RUNS.glob("eval/*/*/eval_info.json")):
         })
 
 def init_label(init, run):
-    """Start policy of a training run as a policy label. Runs before M2 (no `init` in run_info) all
-    started from θ0. A materialized init (seq_stage.sbatch) is deleted after training, so its source
-    comes from materialized_from.json if the dir survives, else from the stage's `from <PREV>` line
-    (seq_stage.sbatch and er_stage.sbatch)."""
+    """Start policy of a training run as a policy label. Runs before the replay sequences (no `init`
+    in run_info) all started from θ0. A materialized init (seq_stage.sbatch) is deleted after
+    training, so its source comes from materialized_from.json if the dir survives, else from the
+    stage's `from <PREV>` line (seq_stage.sbatch and er_stage.sbatch)."""
     if not init:
         return "theta0"
     m = re.search(r"/materialized/([^/]+)$", init.rstrip("/"))
@@ -109,7 +136,7 @@ def init_label(init, run):
     if src.exists():
         return policy_label(json.load(open(src))["source"], None, run)
     hit = re.search(r"^== (?:Sequential|ER) stage \d+: .* from (\S+?)(?:;|$)",
-                    (RUNS / f"slurm-{run.split('-')[0]}.out").read_text(errors="replace"), re.M)
+                    slurm_log(run.split("-")[0]).read_text(errors="replace"), re.M)
     if not hit:
         raise ValueError(f"no source for materialized init {m.group(1)} of run {run}")
     return policy_label(hit.group(1), None, run)
@@ -154,7 +181,7 @@ for ri_path in sorted(RUNS.glob("train/*/run_info.json")):
         "steps": steps, "schedule_steps": ri["steps"], "optimizer": optimizer, "batch_size": ri["batch_size"],
         "passes": round(steps * ri["batch_size"] * (1 - mix) / frames, 2), "task_frames": frames,
         **replay,
-        # train.sh passed no --seed before M2 (3439fb3): the pinned lerobot-train default is 1000
+        # train.sh passed no --seed before the replay sequences: the pinned lerobot-train default is 1000
         "seed": ri.get("seed", 1000), "init": init_label(ri.get("init"), run),
         "peak_lr": sgd_lr.group(1) if sgd_lr else
                    {"default": "default (1e-4)"}.get(ri.get("peak_lr", "default"), ri.get("peak_lr")),
@@ -168,7 +195,7 @@ def train_log(run):
     runs in sequence (E26's counterfactuals: <job>-arm, <job>-grip) logs them one after another, each
     segment ending in train.sh's `TRAIN DONE -> .../train/<run>` line."""
     job = run.split("-")[0]
-    text = (RUNS / f"slurm-{job}.out").read_text(errors="replace")
+    text = slurm_log(job).read_text(errors="replace")
     if run == job:
         return text
     start = 0
@@ -226,6 +253,8 @@ num = r"(\d+\.\d+)"
 row_re = re.compile(rf"^(\S+)\s+(spatial|goal|l10_s4|task23)\s+{num} / {num} / {num}\s+{num} / {num} / {num}\s*$", re.M)
 offline, seen = [], set()
 for job in OFFLINE_LOGS:
+    if not have(RUNS / f"slurm-{job}.out"):
+        continue
     text = (RUNS / f"slurm-{job}.out").read_text(errors="replace")
     if "OFFLINE ACTION ERROR DONE" not in text:
         raise ValueError(f"offline action-error job {job} did not finish")
@@ -245,7 +274,8 @@ for job in OFFLINE_LOGS:
 DRIFT_LOG, DRIFT_LABELS = "113800", {"1k": "train/113795/checkpoints/last", "2k": "train/113796/checkpoints/last",
                                      "3k": "train/113797/checkpoints/last"}
 drift, cur = [], None
-for line in (RUNS / f"slurm-{DRIFT_LOG}.out").read_text(errors="replace").splitlines():
+drift_log = RUNS / f"slurm-{DRIFT_LOG}.out"
+for line in drift_log.read_text(errors="replace").splitlines() if have(drift_log) else []:
     m = re.match(r"== (\S+): ([\d.]+)M parameters changed, relative L2 drift ([\d.]+)", line)
     if m:
         cur = m.group(1)
@@ -256,19 +286,22 @@ for line in (RUNS / f"slurm-{DRIFT_LOG}.out").read_text(errors="replace").splitl
     if m and cur:
         drift.append({"label": cur, "checkpoint": DRIFT_LABELS[cur], "group": m.group(1).strip(),
                       "params_M": float(m.group(2)), "rel_l2": float(m.group(3))})
-if not drift:
+if not drift and drift_log.exists():
     raise ValueError("no weight-drift lines found")
 
-# --- offline buffer coverage (experiments/m3/coverage_offline.py, E40) ----------------------------
+# --- offline buffer coverage (experiments/coverage/coverage_offline.py, E40) ----------------------------
 COVERAGE_JOB = "5696915"
 coverage, coverage_buf = ([dict(r, job=COVERAGE_JOB) for r in csv.DictReader(open(RUNS / "coverage" / COVERAGE_JOB / f))]
+                          if have(RUNS / "coverage" / COVERAGE_JOB) else []
                           for f in ("coverage_per_task.csv", "coverage_actual_buffers.csv"))
 
-# --- buffer memorization (experiments/m2/buffer_memorization.sbatch, E44) -----------------------
+# --- buffer memorization (experiments/replay/buffer_memorization.sbatch, E44) -----------------------
 MEMO_RUNS = {"memo-k14-b0": "train/115623/checkpoints/last", "memo-k14-b1": "train/115630/checkpoints/last",
              "memo-k14-b2": "train/115636/checkpoints/last", "memo-k140-b0": "train/115761/checkpoints/last"}
 memo = []
 for run, ckpt in MEMO_RUNS.items():
+    if not have(RUNS / "memorization" / run / "table.csv"):
+        continue
     for r in csv.DictReader(open(RUNS / "memorization" / run / "table.csv")):
         memo.append({"run": run, "model": "theta0" if r["label"] == "theta0" else ckpt, **r})
 
@@ -284,11 +317,14 @@ for summ in sorted(RUNS.glob("lang_diag/*/lang_diag_summary.json")):
             lang.append({"run": summ.parent.name, "condition": cond, "outcome": outcome, "k": o["k"], "n": o["n"],
                          "pct": o["pc"], "ci95_lo": round(o["ci95"][0], 1), "ci95_hi": round(o["ci95"][1], 1)})
 
-OUT.mkdir(exist_ok=True)
+OUT.mkdir(parents=True, exist_ok=True)
 for name, data in (("runs.csv", rows), ("train_runs.csv", train), ("train_curves.csv", curves),
                    ("offline_action_error.csv", offline), ("weight_drift.csv", drift), ("lang_diag.csv", lang),
                    ("coverage_offline.csv", coverage), ("coverage_buffers.csv", coverage_buf),
                    ("buffer_memorization.csv", memo)):
+    if not data:
+        print(f"skipped {name}: no runs")
+        continue
     with open(OUT / name, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(data[0]))
         w.writeheader()

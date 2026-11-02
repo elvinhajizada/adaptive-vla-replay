@@ -1,9 +1,9 @@
-"""Pre-download every asset M1 needs, at pinned revisions, and set up LIBERO's config.
+"""Pre-download every asset the runs need, at pinned revisions, and set up LIBERO's config.
 
-Run on the LOGIN node (needs internet):
+Run once on a machine with internet access:
     AVLA_ONLINE=1 source scripts/env.sh && python scripts/download_assets.py
 
-Compute-node jobs then run with HF_HUB_OFFLINE=1 (scripts/env.sh sets it).
+Every later shell and job runs with HF_HUB_OFFLINE=1 (scripts/env.sh sets it).
 Idempotent: snapshot_download skips files already in the cache.
 """
 import importlib.util
@@ -19,7 +19,7 @@ from adaptive_vla.config import Config  # noqa: E402
 
 cfg = Config()
 
-# (repo_id, repo_type, revision). The VLM is fetched under the exact name in theta0's
+# (repo_id, repo_type, revision). The VLM is fetched under the exact name in θ0's
 # config.json (`vlm_model_name`): the Hub redirects it to SmolVLM2-500M-Video-Instruct,
 # but the offline cache is keyed by the requested id.
 HUB_ASSETS = [
@@ -60,7 +60,7 @@ def write_libero_config() -> str:
 
 
 if os.environ.get("HF_HUB_OFFLINE") == "1":
-    sys.exit("HF_HUB_OFFLINE=1: run with AVLA_ONLINE=1 on the login node")
+    sys.exit("HF_HUB_OFFLINE=1: run with AVLA_ONLINE=1 on a machine with internet access")
 
 def pin_main_ref(snapshot_path: str, rev: str) -> None:
     """Point the cache's refs/main at our pinned commit.

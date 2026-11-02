@@ -1,6 +1,6 @@
 #!/bin/bash
 # Smoke test body (called by smoke_gpu.sbatch / smoke_cpu.sbatch).
-# Checks: device visible, LIBERO builds offline under EGL, theta0 runs end-to-end through
+# Checks: device visible, LIBERO builds offline under EGL, θ0 runs end-to-end through
 # lerobot-eval (LIBERO-Spatial task 0, 2 episodes). Not a reported number.
 # Usage: bash scripts/smoke.sh {cuda|cpu}
 set -euo pipefail

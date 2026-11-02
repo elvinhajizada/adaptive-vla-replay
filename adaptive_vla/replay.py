@@ -6,7 +6,7 @@ sampled handle back to a (image, instruction, action) example via the dataset.
 Keeping it handle-based makes the buffer cheap and torch-free, and keeps the
 buffer's memory cost honest (handles, not frames).
 
-Per-task cap with uniform-at-random eviction. This is the simple ER baseline the
+Per-task cap with uniform-at-random eviction. This is the simple replay baseline the
 2026 forget-resistance result found surprisingly strong on pretrained VLAs.
 
 MixedSampler turns a buffer's groups plus the current task's frames into the training index

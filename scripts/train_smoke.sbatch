@@ -1,10 +1,10 @@
 #!/bin/bash
-# M1 training smoke test: short fine-tune of theta0 on one LIBERO-90 task to check (a) the training
-# pipeline end-to-end, (b) that saved checkpoints keep theta0's normalizer stats, and
+# Training smoke test: short fine-tune of θ0 on one LIBERO-90 task to check (a) the training
+# pipeline end-to-end, (b) that saved checkpoints keep θ0's normalizer stats, and
 # (c) training throughput at batch 64. Plumbing only: task 0 is arbitrary (not one of the
 # 5 chosen tasks) and the checkpoint is not evaluated.
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-train-smoke
 #SBATCH --partition=<your-partition>
 #SBATCH --gres=gpu:1

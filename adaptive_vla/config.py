@@ -1,6 +1,6 @@
-"""Central configuration for Adaptive VLA V1.
+"""Central configuration: every setting in one place.
 
-The M1 values below were fixed by M1 measurements (2026-10-21 to 23; the experiments are in
+The setup values below were fixed by measurements (2026-10-21 to 23; the experiments are in
 docs/report.md). Everything else is a project default.
 """
 from dataclasses import dataclass, field
@@ -12,13 +12,13 @@ LEROBOT_COMMIT = "9a6bb61043bac8c14353fcb6ea513b7473c118e3"  # LeRobot 0.6.2
 
 @dataclass
 class Config:
-    # --- start checkpoint (theta0) ---
+    # --- start checkpoint (θ0) ---
     policy: str = "smolvla"
     # Released SmolVLA LIBERO fine-tune, trained on lerobot/libero (Spatial/Object/Goal/10).
     # Verified 2026-10-19 (normalizer stats match lerobot/libero), see docs/LIBERO.md section 11.
     pretrained: str = "HuggingFaceVLA/smolvla_libero"
     pretrained_revision: str = "6721902bc4d61e50a3bfdb11dfb4cb626f05d102"
-    # theta0's vlm_model_name is HuggingFaceTB/SmolVLM2-500M-Instruct (load_vlm_weights=True);
+    # θ0's vlm_model_name is HuggingFaceTB/SmolVLM2-500M-Instruct (load_vlm_weights=True);
     # the Hub redirects it to SmolVLM2-500M-Video-Instruct. Revision pinned 2026-10-19.
     vlm_revision: str = "7b375e1b73b11138ff12fe22c8f2822d8fe03467"
     # LIBERO sim assets (meshes, textures); hf-libero fetches them lazily, we prefetch.
@@ -33,7 +33,7 @@ class Config:
     # dataset task_index 22, 13, 5, 8, 20. Chosen 2026-10-22 from the 11 single-scene
     # kitchen candidates (zero-shot 0 to 10%); all pass the headroom rule (zero-shot < 30%, and the
     # 8-pass fine-tune's 95% CI lower bound about 20 pts or more above it): 76, 54, 88, 72, 88%.
-    # Listed in M2 sequence order (fixed 2026-10-25): 26, 18, 23, 27, 34 (scenes 4, 3, 4, 4, 6).
+    # Listed in sequence order (fixed 2026-10-25): 26, 18, 23, 27, 34 (scenes 4, 3, 4, 4, 6).
     new_task_ids: List[int] = field(default_factory=lambda: [26, 18, 23, 27, 34])
 
     # --- old-skill retention probes (schedule fixed before any replay result) ---

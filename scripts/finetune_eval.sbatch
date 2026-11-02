@@ -4,7 +4,7 @@
 # 24 CPUs: dataloader workers for training, then 50 async envs for the batch-50 eval; three of
 # these fit next to one other job on the GPU node's 96 CPUs.
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-ft-eval
 #SBATCH --partition=<your-partition>
 #SBATCH --gres=gpu:1

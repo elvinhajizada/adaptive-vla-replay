@@ -6,7 +6,7 @@
 #   TASKS       LIBERO-Goal task ids used as A, e.g. "8,9,7"
 #   PAIRS       "cycle" (default: A -> next task in TASKS) or an explicit list "8:9,9:7,7:8"
 #   N_EPISODES  per task and condition (default 10); 0 = env selftest only, no policy rollouts
-#   POLICY_DIR  checkpoint dir (default: theta0 snapshot at the pinned revision)
+#   POLICY_DIR  checkpoint dir (default: θ0 snapshot at the pinned revision)
 # Env vars: AVLA_RENDER=<px> render size (as in eval.sh; default 256, the protocol),
 #           AVLA_DEVICE=cuda|cpu (default cuda), AVLA_BLANK=<text> blank instruction (default "").
 #

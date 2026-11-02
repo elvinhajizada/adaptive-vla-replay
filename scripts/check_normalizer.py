@@ -1,10 +1,10 @@
-"""Check that every checkpoint of a lerobot-train run kept theta0's normalizer stats.
+"""Check that every checkpoint of a lerobot-train run kept θ0's normalizer stats.
 
 Usage: python scripts/check_normalizer.py RUN_DIR THETA0_DIR
 
 Compares the action / observation.state mean+std in each checkpoint's pre- and
-post-processor (normalizer, unnormalizer) against theta0's. Any difference means the
-training run re-normalised theta0 (fake forgetting); exits non-zero in that case.
+post-processor (normalizer, unnormalizer) against θ0's. Any difference means the
+training run re-normalised θ0 (fake forgetting); exits non-zero in that case.
 """
 import sys
 from pathlib import Path

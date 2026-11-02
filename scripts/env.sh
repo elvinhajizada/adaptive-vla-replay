@@ -2,7 +2,7 @@
 # Activates the venv and sets the storage layout and run-time env vars.
 #
 # Storage, all under $AVLA_DSS (default ~/avla-data; set AVLA_DSS before sourcing to move it):
-#   hf_cache/  theta0, SmolVLM2, nvidia dataset (~12 GB)
+#   hf_cache/  θ0, SmolVLM2, nvidia dataset (~12 GB)
 #   data/      converted datasets (libero90_theta0; videos symlinked into hf_cache)
 #   runs/      checkpoints, eval outputs, slurm logs
 # LIBERO sim assets stay in ~/.cache/libero/assets (400 MB, path fixed by download_assets.py).
@@ -35,7 +35,7 @@ if [ "${AVLA_ONLINE:-0}" != "1" ]; then
 fi
 
 # Memory watchdog, once per batch job on a compute node (SLURMD_NODENAME is unset in a salloc
-# shell on the login node). Slurm sites without cgroups do not enforce --mem, so the watchdog keeps
+# shell outside a batch job). Slurm sites without cgroups do not enforce --mem, so the watchdog keeps
 # the job inside it and kills the job rather than let it run a shared node out of memory
 # (scripts/memguard.py).
 if [ -n "${SLURM_JOB_ID:-}" ] && [ -n "${SLURMD_NODENAME:-}" ] && [ -z "${AVLA_MEMGUARD:-}" ] \

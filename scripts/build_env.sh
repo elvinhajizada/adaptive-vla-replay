@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build the project venv on a GPU machine (CUDA 12.6 wheels). Needs internet: on a cluster, run it
-# on the login node (compute nodes may not have it).
+# on a node with internet access (compute nodes may not have it).
 # Installs the exact versions in requirements-lock.txt. --relock instead installs requirements.txt
 # (the loose pins) and rewrites requirements-lock.txt from the result; use it only to change the env.
 # Idempotent: re-running reuses .venv and only installs what is missing.

@@ -9,7 +9,7 @@
 #               instruction string, never by integer id (docs/LIBERO.md, section 5)
 #   STEPS       training steps; the scheduler fits warmup + cosine decay into this length;
 #               or PASSES with a trailing p (e.g. 8p): steps = ceil(passes x task frames / 64),
-#               the M2 protocol (fixed passes per task, since 2026-10-22)
+#               the replay-run protocol (fixed passes per task, since 2026-10-22)
 #   N_EPISODES  eval episodes (default 50); batch = N_EPISODES
 set -euo pipefail
 ENV_ID="${1:?usage: finetune_eval.sh ENV_ID STEPS|PASSESp [N_EPISODES]}"

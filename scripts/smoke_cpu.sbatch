@@ -4,7 +4,7 @@
 # EGL without a GPU relies on Mesa's software device; if the env reset fails here,
 # that is a CPU-node rendering limit, not necessarily a pipeline bug.
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-smoke-cpu
 #SBATCH --partition=<your-partition>
 #SBATCH --cpus-per-task=16

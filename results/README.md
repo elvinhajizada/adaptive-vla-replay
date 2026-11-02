@@ -28,10 +28,10 @@ CPU plumbing runs are left out.
 | run | training output directory (job id) |
 | dataset_task_index, task, task_frames | converted LIBERO-90 task(s) and their frame count |
 | steps, passes | training steps and passes over the task's demos (steps x batch x (1 - mix) / frames) |
-| k, mix | replay runs (M2): demo frames kept per old task (`all` = every frame) and the replay share of each batch; blank k and mix 0 = no replay |
+| k, mix | replay runs: demo frames kept per old task (`all` = every frame) and the replay share of each batch; blank k and mix 0 = no replay |
 | replay_frames, replay_mb_obs | replay buffer size: frames, and MB of stored observations |
 | replay_seed | seed of the replay-buffer draw (separate from the training seed) |
-| seed | training seed (1000 = the lerobot-train default, used by every run before M2) |
+| seed | training seed (1000 = the lerobot-train default, used by every run before the replay sequences) |
 | init | start policy: `theta0`, or the checkpoint it continues from (the Sequential chain) |
 | peak_lr | peak learning rate (θ0's recipe: 1e-4, cosine to peak / 40) |
 | loss_dims | action dims supervised: `all`, or `arm` / `grip` for E26's loss-masked counterfactuals |
@@ -60,33 +60,33 @@ the stage-5 checkpoint) and frame set (`buffered`: θ0 frames in that run's buff
 frames of the same θ0 tasks, at least 10 rows from any buffered frame; `current`: the stage's own task),
 mean |error| of the first 10 predicted actions vs the demo and vs θ0 (std units), as in
 `offline_action_error.csv`.
-**`failure_anatomy.csv`** (E45, written by `experiments/m2/m2_task_analysis.py`, not by the
+**`failure_anatomy.csv`** (E45, written by `experiments/replay/task_analysis.py`, not by the
 collector): per condition (`theta0-E41`, `k14-b0`, ...) and two-step task, final-checkpoint success
 and the share of episodes where each goal predicate holds at the end (`step1`, `step2`), in demo order
 (`order` = demo) or, for E47's far-scene LIBERO-10 tasks 0, 1, 4, 6, 7, in the order the instruction names
 them (`order` = instruction); θ0 rows `theta0-E41`, `theta0-113801` (task 3), `theta0-E47`.
-**`skill_margin.csv`** (E45, same script): per Spatial and Goal task, θ0's success in the M1 run
+**`skill_margin.csv`** (E45, same script): per Spatial and Goal task, θ0's success in the setup run
 (`theta0_margin`), θ0's reference in E41 (`theta0_ref`), and retention = final success / reference per
 replay run and averaged.
-**`m2_metrics_ci.csv`** (written by `experiments/m2/m2_metrics_ci.py`, not by the collector): per condition
+**`m2_metrics_ci.csv`** (written by `experiments/replay/metrics_ci.py`, not by the collector): per condition
 (`ER k14`, ...), seed (`b0`, ...; `mean` = seed mean) and metric, the estimate and a 95% percentile bootstrap
 interval over episodes (episode noise only): `nbt`, normalized forgetting (`_stage5_x20`, `_final_x50`),
 `final_<suite>` (final probes), `retention_<suite>` (final / θ0 on the final protocol, θ0's episodes
-resampled too; θ0 = every run of the final protocol pooled: `115785`, the M1 runs `113038-goal` and
+resampled too; θ0 = every run of the final protocol pooled: `115785`, the setup runs `113038-goal` and
 `113038-l10kitchen`, and `113801` for LIBERO-10 task 3), `learned_task<id>` and
 `learning_cost_task<id>` / `learning_cost_mean` (just-learned success minus the mean no-replay reference:
-Sequential and the M1 single-task fine-tunes, E48a).
-**`phase_coverage.csv`** (E48b, `experiments/m2/phase_coverage.py`): per LIBERO-10 task 2, 3, 9 and k = 140
+Sequential and the single-task fine-tunes, E48a).
+**`phase_coverage.csv`** (E48b, `experiments/replay/phase_coverage.py`): per LIBERO-10 task 2, 3, 9 and k = 140
 stage-5 buffer, the step-2 frames in the demos and in the buffer, their shares, and the demos whose step 2
 the buffer covers.
-**`step_conditional.csv`** (E52, `experiments/m2/step_conditional.py`): per group (`kitchen` = LIBERO-10
+**`step_conditional.csv`** (E52, `experiments/replay/step_conditional.py`): per group (`kitchen` = LIBERO-10
 tasks 2, 3, 9 in demo order; `far` = E47's tasks 0, 1, 4, 6, 7 in instruction order), task (`pooled` or the
 task id) and condition (seeds pooled), the end-of-episode shares `step1`, `step2` and `step2_given_step1` from
 each final probe's `subgoals.jsonl`, and for replay conditions retention vs θ0 of step 1 and of step 2 given
 step 1 with 95% bootstrap intervals (episodes resampled within run and task, θ0's too) and the interval of
 their difference (`diff_lo`, `diff_hi`). θ0: the runs with sub-goal logs (`115785`, `113801`, E47).
 
-**`gripper_*.csv`** (E26, E33, E34, written by `experiments/m1/gripper_forensics.py report`, not by the
+**`gripper_*.csv`** (E26, E33, E34, written by `experiments/single_finetune/gripper_forensics.py report`, not by the
 collector): teacher-forced on 210 Spatial and Goal frames at four grasp phases (approach, pre-grasp,
 hold, pre-release), fixed noise. Model labels as in `offline_action_error.csv`, plus `cf_arm` /
 `cf_grip` (train runs `115546-arm` / `115546-grip`).
@@ -124,26 +124,31 @@ For each section of `docs/report.md`: the experiment ids, the launcher or analys
 label starts with the job that ran it; `*` stands for the stage or seed parts). Offline analyses
 have no run label and point to their own CSV.
 
+Names in labels and tables: `Sequential` and `seq` are the no-replay sequence, `ER` is experience
+replay; `k14`, `k140`, `kall` and `kp2.05` are the 0.2%, 2%, every-frame and length-proportional
+budgets. Seeds `b0`, `b1`, `b2` are the report's seeds 1, 2 and 3: buffer and training seed (0, 1000),
+(1, 1001) and (2, 1002).
+
 | Section | Experiments | Launcher or analysis | Run labels or result file | Planned or added |
 |---|---|---|---|---|
 | 2.1 Data conversion | E02, E08 | `scripts/convert_libero90.sbatch`, `scripts/train_smoke.sbatch` | none (data checks) | planned |
-| 2.2 New tasks | E10, E11, E12, E19 | `experiments/m1/candidate_demos.py`, `experiments/m1/zeroshot_kitchen.sbatch`, `experiments/m1/probe_baselines.sbatch`, `scripts/finetune_eval.sh` | `113037-r256` (zero-shot); `113038-goal-r256`, `113038-l10kitchen-r256` (θ0); `113795-r256`, `113803-r256` to `113806-r256` (single-task fine-tunes) | planned |
+| 2.2 New tasks | E10, E11, E12, E19 | `experiments/setup/candidate_demos.py`, `experiments/setup/zeroshot_kitchen.sbatch`, `experiments/setup/probe_baselines.sbatch`, `scripts/finetune_eval.sh` | `113037-r256` (zero-shot); `113038-goal-r256`, `113038-l10kitchen-r256` (θ0); `113795-r256`, `113803-r256` to `113806-r256` (single-task fine-tunes) | planned |
 | 2.3 Language use | E07 | `scripts/lang_diag.sbatch` | `results/lang_diag.csv` | planned (required check) |
 | 2.4 Training length | E13 | `scripts/finetune_eval.sbatch` | `113795-r256`, `113796-r256`, `113797-r256` | planned |
-| 2.5 Render size, repeatability | E03 to E06, E17, E29 | `experiments/m1/eval_theta0_spatial.sbatch`, `experiments/m1/eval_theta0_spatial_r256.sbatch`, `experiments/m1/subgoal_check.sbatch`, `scripts/probe_eval.sbatch` | `113009` (360x360), `113024-r256`, `113801-r256`, `115594-theta0-refA-r256`, `115595-theta0-refB-r256` | E06 agreed in advance after E03; E29 planned |
-| 2.6 θ0 reference, every run of the final protocol pooled | E41, E12, E17 | `experiments/m2/m2_metrics_ci.py` | `115785-theta0-final-r256`, `113038-goal-r256`, `113038-l10kitchen-r256`, `113801-r256` | changed after review |
-| 3 One fine-tune | E14, E18, E21 to E25 | `experiments/m1/forgetting_vs_steps.sbatch`, `experiments/m1/far_probe_check.sbatch`, `experiments/m1/forgetting_onset.sbatch`, `experiments/m1/lr_test.sbatch`, `scripts/probe_eval.sbatch`, `scripts/offline_action_error.py` | `113800-ft23-*`, `113802-ft23-1k-r256`, `114663-ft26-r256`, `114664-ft27-r256`, `113822-s000*`, `113823-*`; drift in `results/offline_action_error.csv` | E14 planned, its result a surprise; the others added after it |
-| 3 Sequence without replay | E32 | `experiments/m2/seq_stage.sbatch` | `113804-r256` (stage 1), `115603-seq-*` to `115606-seq-*`, `115615-seq-s5-final-r256` | planned |
-| 4 Single-stage pilot | E30 | `experiments/m2/pilot_stage.sbatch` | `115608-t26-k14-r256` to `115613-t23-kall-r256` | planned |
-| 4 Budget and retention | E37 (0.2%), E39 (2%, seed 1), E41 (θ0), E42 (2%, seed 2), E43 (every frame), E46 (every frame, seed 2) | `experiments/m2/er_stage.sbatch`, `experiments/m2/er_seed_chain.sh`, `scripts/probe_eval.sbatch` | 0.2%: `115608-*`, `115620-*` to `115641-*` (`k14`, `er14`); 2%: `115609-*`, `115758-*` to `115762-*`, `115786-*` to `115791-*` (`k140`); every frame: `115611-*`, `115792-*` to `115796-*`, `115815-*` to `115820-*` (`kall`); θ0: `115785-theta0-final-r256` | E37 planned; E39 added after E37; E41 and E42 planned; E43 added after E39; E46 added after E43 |
-| 5 Failure anatomy, margin | E45 | `experiments/m2/m2_task_analysis.py` | the `*-s5-final-*` labels above; `results/failure_anatomy.csv`, `results/skill_margin.csv` | planned |
-| 5 Second sub-goal given the first | E52 | `experiments/m2/step_conditional.py` | `results/step_conditional.csv` (from the final probes' per-episode logs) | added after review, no prediction |
+| 2.5 Render size, repeatability | E03 to E06, E17, E29 | `experiments/setup/eval_theta0_spatial.sbatch`, `experiments/setup/eval_theta0_spatial_r256.sbatch`, `experiments/setup/subgoal_check.sbatch`, `scripts/probe_eval.sbatch` | `113009` (360x360), `113024-r256`, `113801-r256`, `115594-theta0-refA-r256`, `115595-theta0-refB-r256` | E06 agreed in advance after E03; E29 planned |
+| 2.6 θ0 reference, every run of the final protocol pooled | E41, E12, E17 | `experiments/replay/metrics_ci.py` | `115785-theta0-final-r256`, `113038-goal-r256`, `113038-l10kitchen-r256`, `113801-r256` | changed after review |
+| 3 One fine-tune | E14, E18, E21 to E25 | `experiments/single_finetune/forgetting_vs_steps.sbatch`, `experiments/single_finetune/far_probe_check.sbatch`, `experiments/single_finetune/forgetting_onset.sbatch`, `experiments/single_finetune/lr_test.sbatch`, `scripts/probe_eval.sbatch`, `scripts/offline_action_error.py` | `113800-ft23-*`, `113802-ft23-1k-r256`, `114663-ft26-r256`, `114664-ft27-r256`, `113822-s000*`, `113823-*`; drift in `results/offline_action_error.csv` | E14 planned, its result a surprise; the others added after it |
+| 3 Sequence without replay | E32 | `experiments/replay/seq_stage.sbatch` | `113804-r256` (stage 1), `115603-seq-*` to `115606-seq-*`, `115615-seq-s5-final-r256` | planned |
+| 4 Single-stage pilot | E30 | `experiments/replay/pilot_stage.sbatch` | `115608-t26-k14-r256` to `115613-t23-kall-r256` | planned |
+| 4 Budget and retention | E37 (0.2%), E39 (2%, seed 1), E41 (θ0), E42 (2%, seed 2), E43 (every frame), E46 (every frame, seed 2) | `experiments/replay/er_stage.sbatch`, `experiments/replay/er_seed_chain.sh`, `scripts/probe_eval.sbatch` | 0.2%: `115608-*`, `115620-*` to `115641-*` (`k14`, `er14`); 2%: `115609-*`, `115758-*` to `115762-*`, `115786-*` to `115791-*` (`k140`); every frame: `115611-*`, `115792-*` to `115796-*`, `115815-*` to `115820-*` (`kall`); θ0: `115785-theta0-final-r256` | E37 planned; E39 added after E37; E41 and E42 planned; E43 added after E39; E46 added after E43 |
+| 5 Failure anatomy, margin | E45 | `experiments/replay/task_analysis.py` | the `*-s5-final-*` labels above; `results/failure_anatomy.csv`, `results/skill_margin.csv` | planned |
+| 5 Second sub-goal given the first | E52 | `experiments/replay/step_conditional.py` | `results/step_conditional.csv` (from the final probes' per-episode logs) | added after review, no prediction |
 | 5 Far-scene control | E47 | `scripts/probe_eval.sbatch` | `115841-e47-farscene-*` to `115845-e47-farscene-*` | added after E45, rule fixed first |
-| 5 Phase coverage | E48 (b) | `experiments/m2/phase_coverage.py` | `results/phase_coverage.csv` | added after E45, prediction first |
+| 5 Phase coverage | E48 (b) | `experiments/replay/phase_coverage.py` | `results/phase_coverage.csv` | added after E45, prediction first |
 | 5 Task 9 at stage 4 | E49 | `scripts/probe_eval.sbatch` | `115846-e49-task9-*`, `115847-e49-task9-*` | added after E46, rule fixed first |
-| 5 Proportional split | E50 (E51, a second seed, stopped after two stages) | `experiments/m2/e50_prop_chain.sh` | `115873-*` to `115879-*` (`kp2.05`) | added after E47, rule fixed first |
-| 6 Learning cost | E37, E39, E42, E43, E46; E48 (a) | `experiments/m2/m2_metrics_ci.py` | the `libero_90` rows of the sequences above; `113795-r256`, `113803-r256` to `113806-r256`; `results/m2_metrics_ci.csv` | E48 (a) post hoc, no prediction |
-| 6 Memorization | E44 | `experiments/m2/buffer_memorization.sbatch` | `results/buffer_memorization.csv` | planned |
+| 5 Proportional split | E50 (E51, a second seed, stopped after two stages) | `experiments/replay/e50_prop_chain.sh` | `115873-*` to `115879-*` (`kp2.05`) | added after E47, rule fixed first |
+| 6 Learning cost | E37, E39, E42, E43, E46; E48 (a) | `experiments/replay/metrics_ci.py` | the `libero_90` rows of the sequences above; `113795-r256`, `113803-r256` to `113806-r256`; `results/m2_metrics_ci.csv` | E48 (a) post hoc, no prediction |
+| 6 Memorization | E44 | `experiments/replay/buffer_memorization.sbatch` | `results/buffer_memorization.csv` | planned |
 | 7 Noise and drift | E29, E37; offline drift in E32, E37, E39, E43, E46 | `scripts/offline_action_error.py` | `115594-theta0-refA-r256`, `115595-theta0-refB-r256`; `results/offline_action_error.csv` | planned |
 
 ## Experiment ids

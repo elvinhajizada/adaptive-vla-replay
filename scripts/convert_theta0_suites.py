@@ -1,4 +1,4 @@
-"""Build the M2 replay dataset: LIBERO-90 plus θ0's four training suites, in θ0's conventions.
+"""Build the replay dataset: LIBERO-90 plus θ0's four training suites, in θ0's conventions.
 
 The replay buffer draws from earlier new tasks *and* θ0's own training data
 (Spatial/Object/Goal/10). The nvidia copies of those suites hold the same demos as θ0's
@@ -58,7 +58,7 @@ def aligned_roots() -> dict:
     yaw" where the suites say "axis_angle1..3", and some suites carry per-feature "fps" keys.
     The values are axis-angle in all of them (components reach 4.8 and -4.4, outside any
     roll/pitch/yaw range, with no ±π wraps; checked 2026-10-25, job 5688247). The suites'
-    roots are ours and get the canonical features written in. LIBERO-90's root fed M1's reported
+    roots are ours and get the canonical features written in. LIBERO-90's root fed the single-task
     runs and is not edited: it is merged through a shadow root (symlinks plus an aligned info.json).
     """
     canon = json.loads((SOURCES["libero_spatial"] / "meta" / "info.json").read_text())["features"]

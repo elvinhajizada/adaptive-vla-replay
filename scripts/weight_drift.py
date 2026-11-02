@@ -18,7 +18,8 @@ from pathlib import Path
 import torch
 from safetensors.torch import load_file
 
-from adaptive_vla import checkpoints as ck
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from adaptive_vla import checkpoints as ck  # noqa: E402
 
 base_dir, runs = Path(sys.argv[1]), [a.split("=", 1) for a in sys.argv[2:]]
 base = load_file(str(base_dir / ck.MODEL))

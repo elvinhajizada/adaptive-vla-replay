@@ -226,7 +226,9 @@ c(k, k), next to NBT.
   HarnessPAI's. Compare only within one paper's protocol.
 - **θ0 reproduction.** θ0 is the released SmolVLA LIBERO checkpoint; its model card gives
   no LIBERO numbers. Our eval: Spatial 76/100, Goal 152/200, the 4 LIBERO-10 kitchen tasks
-  103/200 (render 256, seed 1000). Community runs of the checkpoint reach about 80% (unverified), and
+  103/200 (render 256, seed 1000). On the final probes of the report (20 episodes per
+  Spatial and Goal task, LIBERO-10 tasks 2, 3 and 9) θ0 scores 73.5, 77 and 61% (report, section 2.6).
+  Community runs of the checkpoint reach about 80% (unverified), and
   the SmolVLA paper reports 90% for Spatial.
 - **LeRobot's π0.5 reproduction:** 97.5% (unverified).
 
@@ -396,7 +398,8 @@ frames or chunk starts before matching it.
 
 ## 10. Practical notes (LeRobot 0.6.2)
 
-- **Install:** `pip install -e ".[libero]"` (Linux only).
+- **Install:** LeRobot's LIBERO extra (`pip install -e ".[libero]"` in a LeRobot checkout, Linux only).
+  This repository installs pinned versions instead (README, step 1).
 - **Headless rendering:** `MUJOCO_GL=egl` on a GPU machine, `osmesa` on a CPU-only one.
 - **Render size: 256×256.** Pass `--env.observation_height=256
   --env.observation_width=256` to match θ0's training frames. The env default of 360×360
@@ -419,7 +422,7 @@ frames or chunk starts before matching it.
 - **CPU-bound rollouts:** simulation is the bottleneck, so request enough cores for
   parallel envs.
 
-## 11. Implications for adaptive-vla
+## 11. Implications for this project
 
 State as of 2026-10-26. The evidence for each point is in `docs/report.md`.
 
@@ -431,9 +434,9 @@ State as of 2026-10-26. The evidence for each point is in `docs/report.md`.
   slot mapping is needed (the three-slot layout belongs to `smolvla_base`).
 - **Replanning.** `n_action_steps=1`, so θ0 replans every step. Keep this for
   reproduction and log it.
-- **Reference numbers.** Spatial 76%, Goal 76%, LIBERO-10 kitchen tasks 51.5%, all at
-  render 256 (section 7). These, not the paper's numbers, are the baseline for every
-  forgetting claim.
+- **Reference numbers.** θ0's own evaluation, not the paper's numbers, is the baseline for
+  every forgetting claim: on the final probes Spatial 73.5%, Goal 77%, LIBERO-10 tasks 2, 3
+  and 9 61%, at render 256 (report, section 2.6; the first evaluations are in section 7).
 - **Training data for new tasks.** The new tasks come from `nvidia/LIBERO_LeRobot_v3`
   @ `e5907374`, so apply the section 5 conversion. Keep θ0's normalizer stats fixed
   for every stage: drifting stats would shift old skills too and look like forgetting.

@@ -10,7 +10,7 @@
 # probe LIBERO-10 task 3 42/50 (113038), Spatial 76/100 (113024), Goal 74/100 on the first 10 eps
 # per task (113038).
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-probe-eval
 #SBATCH --partition=<your-partition>
 #SBATCH --gres=gpu:1

@@ -1,10 +1,10 @@
 #!/bin/bash
 # Language-check plumbing on a CPU node. Not a result.
 # 1) env selftest for all 9 cells of the proposed design (tasks 8,9,7, cyclic pairs), no policy;
-# 2) theta0 on one cell per condition (A=8, B=9), 1 episode each: true, blank, swapped.
+# 2) θ0 on one cell per condition (A=8, B=9), 1 episode each: true, blank, swapped.
 # About 36 min per episode on 16 cores. Body: scripts/lang_diag.sh.
 # Slurm settings: a template from the cluster these runs used. Set the partition
-# (and account or QOS if your site needs them) before submitting.
+# here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --job-name=avla-langdiag-cpu
 #SBATCH --partition=<your-partition>
 #SBATCH --cpus-per-task=16

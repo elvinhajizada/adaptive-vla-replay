@@ -1,11 +1,11 @@
 #!/bin/bash
-# One-command LIBERO eval of a SmolVLA policy (theta0 by default) through the pinned lerobot-eval.
+# One-command LIBERO eval of a SmolVLA policy (θ0 by default) through the pinned lerobot-eval.
 #
 # Usage: bash scripts/eval.sh SUITE [TASK_IDS] [N_EPISODES] [POLICY_DIR]
 #   SUITE       libero_spatial | libero_object | libero_goal | libero_10 | libero_90
 #   TASK_IDS    "all" (default) or a list like "[0,1,2]"
 #   N_EPISODES  per task (default 10)
-#   POLICY_DIR  checkpoint dir (default: theta0 snapshot at the pinned revision)
+#   POLICY_DIR  checkpoint dir (default: θ0 snapshot at the pinned revision)
 # Env var AVLA_RENDER=<px> overrides the render size (default 256, the protocol).
 # Env var AVLA_SUBGOALS=1 also logs per-episode goal predicates (secondary metric; success is
 # unchanged, see adaptive_vla/subgoal_env.py): writes subgoals.jsonl + subgoals_summary.json.

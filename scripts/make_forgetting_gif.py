@@ -6,7 +6,7 @@ Each panel is TITLE|VERDICT|VIDEO, VIDEO relative to $AVLA_RUNS/eval, VERDICT su
   task-23 1k fine-tune on the same probe episode              -> failure (forgetting)
   task-23 1k fine-tune on task 23 itself                      -> success (new skill)
 Usage (CPU; PyAV and Pillow from the venv):
-  python scripts/make_forgetting_gif.py [--out docs/figures/X.gif] ["TITLE|VERDICT|VIDEO" ...]
+  python scripts/make_forgetting_gif.py [--out docs/figures/<name>.gif] ["TITLE|VERDICT|VIDEO" ...]
 """
 import argparse
 import os

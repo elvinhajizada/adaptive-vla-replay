@@ -1,4 +1,4 @@
-"""Convert nvidia LIBERO-90 to theta0's conventions and verify it through LeRobotDataset.
+"""Convert nvidia LIBERO-90 to θ0's conventions and verify it through LeRobotDataset.
 
 Run in a Slurm CPU job (file I/O + a few video decodes): scripts/convert_libero90.sbatch.
 Output: $AVLA_RUNS/../data/libero90_theta0 (DSS; rebuildable from the HF cache).

@@ -1,4 +1,4 @@
-"""lerobot-train with experience replay (M2: a buffer of k frames per task, 1:1 mixing).
+"""lerobot-train with experience replay (a buffer of k frames per task, 1:1 mixing).
 
 AVLA_REPLAY_SPEC=<spec.json>   written by scripts/replay_spec.py: the current task's frames, the
                                replay buffer (k frames per task), mix, batch size and seed
@@ -48,7 +48,7 @@ class SpecSampler(MixedSampler):
         return {"epoch": self._epoch}
 
     def load_state_dict(self, state):
-        raise NotImplementedError("M2 stages never resume")
+        raise NotImplementedError("replay stages never resume")
 
 
 lt.EpisodeAwareSampler = SpecSampler

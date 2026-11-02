@@ -1,4 +1,4 @@
-"""Write the replay spec for one M2 stage (read by scripts/replay_train.py).
+"""Write the replay spec for one replay stage (read by scripts/replay_train.py).
 
   python scripts/replay_spec.py --current 26 --k 140 --seed 0 --out spec.json
   python scripts/replay_spec.py --current 23 --earlier 26,18 --old all --k 140 --seed 1 --out spec.json
@@ -12,7 +12,7 @@
             split in proportion to task length)
 --seed      buffer sample and sampler seed (varies with the run seed)
 --keep      the previous stage's spec: assert every task buffered there has the same frames here
-Random selection: each task's k frames are a uniform sample without replacement (the Random ER
+Random selection: each task's k frames are a uniform sample without replacement (the random-replay
 condition). Steps = ceil(passes x current frames / current slots per batch): passes count
 current-task samples only. Prints the steps and the buffer ledger; the spec carries both.
 """
@@ -33,7 +33,7 @@ BYTES_OBS = 2 * 256 * 256 * 3 + 8 * 4
 BYTES_DEMO = BYTES_OBS + 50 * 7 * 4
 # Rows of libero_all_theta0 that cannot be decoded: one corrupt AV1 packet in the upstream
 # nvidia/LIBERO_LeRobot_v3 libero_goal wrist video (episode 4889, "push the plate to the front of the
-# stove", frames 105 and 106 of 129; experiments/m2/video_integrity.py, E46). Loading either row
+# stove", frames 105 and 106 of 129; experiments/replay/video_integrity.py, E46). Loading either row
 # raises, so no completed run ever trained on them. They are removed after the buffer draw, so every
 # k-frame buffer drawn before this fix is unchanged; only k = "all" loses these 2 frames.
 UNDECODABLE = {699256, 699257}

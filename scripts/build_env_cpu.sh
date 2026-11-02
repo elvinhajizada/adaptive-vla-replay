@@ -1,7 +1,7 @@
 #!/bin/bash
-# Build the project venv on a CPU-only dev machine (laptop, WSL2 Ubuntu). Needs internet and uv.
+# Build the project venv on a CPU-only machine (tested on Ubuntu under WSL2). Needs internet and uv.
 # Same Python (3.13.7) and the same pinned versions as requirements-lock.txt, with the CUDA
-# wheels swapped for CPU ones, so code tested here matches what runs on the GPU cluster.
+# wheels swapped for CPU ones, so code tested here matches what runs on the GPU machine.
 # Idempotent: re-running reuses .venv and only installs what is missing.
 # System packages first (Ubuntu): git build-essential cmake libosmesa6-dev libgl1 libglfw3
 # Usage: bash scripts/build_env_cpu.sh 2>&1 | tee build_env_cpu.log

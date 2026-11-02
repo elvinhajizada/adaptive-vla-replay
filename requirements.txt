@@ -1,4 +1,4 @@
-# Adaptive VLA V1 environment. Python 3.13.7, CUDA 12.6.
+# Python environment of this repository. Python 3.13.7, CUDA 12.6.
 # Build: scripts/build_env.sh (GPU machine, installs requirements-lock.txt; --relock rewrites
 # the lock from this file) or scripts/build_env_cpu.sh (CPU dev machine, derives CPU pins from the lock).
 #
@@ -9,8 +9,8 @@
 #
 # Resolved with `pip install --dry-run` on 2026-09-25 (163 packages): torch 2.11.0+cu126,
 # torchvision 0.26.0+cu126, transformers 5.5.4, numpy 2.2.6, mujoco 3.8.1,
-# robosuite 1.4.0, peft 0.21.0. Not yet installed. After the M1 install, freeze the
-# result to requirements-lock.txt and treat that as the reproducible environment.
+# robosuite 1.4.0, peft 0.21.0. The installed result is frozen in requirements-lock.txt, the
+# reproducible environment.
 
 --extra-index-url https://download.pytorch.org/whl/cu126
 

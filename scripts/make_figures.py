@@ -79,6 +79,12 @@ def pct_axis(ax, lo=0, hi=100):
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
 
 
+def note(fig, axes, y, text):
+    """A muted note under the panels, left-aligned with the leftmost panel's axis (call after layout)."""
+    x0 = min(ax.get_position().x0 for ax in np.ravel(axes))
+    fig.text(x0, y, text, color=MUTED, fontsize=8.5, ha="left")
+
+
 # --- Fig 5: onset, success and offline drift vs training step (two panels) ---------------------------
 def fig5():
     off = {(r["label"], r["frame_set"]): r for r in read("offline_action_error.csv")}
@@ -250,9 +256,9 @@ def fig11():
         ax.set_ylim(-0.05, 1.15)
         ax.set_yticks(np.arange(0, 1.01, 0.2))
     axes[0].set_ylabel("retention (final success / θ0's)")
-    fig.text(0.01, -0.08, "After five new tasks. Dots: seeds (no replay 1, k = 14 3, k = 140 2, every frame 2); "
-             "bars and labels: retention of the seed mean,\nagainst θ0 on the same protocol. "
-             "No replay was probed with fewer episodes (10 per Spatial and Goal task, 20 per LIBERO-10 task).", color=MUTED, fontsize=8.5)
+    note(fig, axes, -0.08, "After five new tasks. Dots: seeds (no replay 1, k = 14 3, k = 140 2, every frame 2); "
+         "bars and labels: retention of the seed mean,\nagainst θ0 on the same protocol. "
+         "No replay was probed with fewer episodes (10 per Spatial and Goal task, 20 per LIBERO-10 task).")
     save(fig, "fig11_m2_retention")
 
 
@@ -307,7 +313,7 @@ def fig13():
             for v in vals:
                 a1.scatter(np.arange(5) + off, v, s=14, color=M2_COL[b], alpha=0.55, lw=0, zorder=3)
         a1.plot(np.arange(5) + off, vals.mean(0), color=M2_COL[b], lw=0, **MARK, zorder=4, label=M2_K[b])
-    # second no-replay reference (E48a): M1 single-task fine-tunes from θ0 (task 26's is Sequential stage 1)
+    # second no-replay reference (E48a): single-task fine-tunes from θ0 (task 26's is Sequential stage 1)
     m1 = {18: 113803, 23: 113795, 27: 113805, 34: 113806}
     xs = [i + (0 - 1.5) * 0.15 for i, t in enumerate(M2_TASKS) if t in m1]
     ys = [100 * cells[(m1[t], "libero_90", t, False)][0] / cells[(m1[t], "libero_90", t, False)][1]
@@ -385,8 +391,8 @@ def fig14():
         pct_axis(ax, 0, 105)
     fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=9)
     fig.tight_layout(h_pad=2.0)
-    fig.text(0.01, -0.03, "Replay budgets at the final checkpoint (x 50; seed means). Sub-goals in the order the demos reach them.",
-             color=MUTED, fontsize=8.5)
+    note(fig, axes, -0.03, "Replay budgets at the final checkpoint (x 50; seed means). "
+         "Sub-goals in the order the demos reach them.")
     save(fig, "fig14_m2_anatomy")
 
 

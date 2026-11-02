@@ -13,7 +13,7 @@ from adaptive_vla import libero_data as ld  # noqa: E402
 def test_gripper_mapping():
     g = np.array([1.0, 0.0, 1.0], dtype=np.float32)        # nvidia: open, close, open
     out = ld.gripper_to_theta0(g)
-    assert out.tolist() == [-1.0, 1.0, -1.0]                 # theta0: -1 open, +1 close
+    assert out.tolist() == [-1.0, 1.0, -1.0]                 # θ0: -1 open, +1 close
     assert out.dtype == np.float32
 
 

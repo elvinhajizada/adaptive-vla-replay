@@ -1,4 +1,4 @@
-"""Language check: does theta0 use the language instruction? (docs/LIBERO.md, sections 9 and 11).
+"""Language check: does θ0 use the language instruction? (docs/LIBERO.md, sections 9 and 11).
 
 Protocol. LIBERO-Goal, a few tasks, N episodes each, three conditions:
   true     task A's initial state, A's instruction, scored by A's goal (baseline)

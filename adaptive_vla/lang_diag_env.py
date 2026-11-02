@@ -2,7 +2,7 @@
 
 Imports the pinned LeRobot and LIBERO at module level, so import it only in a shell or job
 that sourced scripts/env.sh (LIBERO_CONFIG_PATH, MUJOCO_GL). It sits apart from
-lerobot_glue.py so the M2 glue stays importable without LIBERO.
+lerobot_glue.py so the replay glue stays importable without LIBERO.
 
 Async eval workers start with `forkserver` and rebuild envs from pickled factories, so the
 env class lives here (importable by reference) and every override travels as a constructor
