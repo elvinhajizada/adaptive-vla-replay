@@ -1,0 +1,9 @@
+new_task,old_objective,new_loss_part,new_loss_part_value,grad_norm,cosine_with_old_objective_grad,sgd_first_order_change_per_unit_lr,adam_first_order_change_per_unit_lr
+task23,old_grip,arm,1.00864,6.978641,-0.0221,2.9184e-02,1.7510e+01
+task23,old_grip,grip,0.0023,0.248292,0.0422,-1.9817e-03,7.3854e-01
+task23,old_arm,arm,1.00864,6.978641,0.1053,-5.5775e-01,1.4274e+01
+task23,old_arm,grip,0.0023,0.248292,0.0113,-2.1290e-03,-9.7078e-01
+task26,old_grip,arm,1.15541,5.717493,-0.0355,3.8359e-02,3.5271e+01
+task26,old_grip,grip,0.06708,1.186612,0.0936,-2.1010e-02,-2.0640e+01
+task26,old_arm,arm,1.15541,5.717493,0.0265,-1.1504e-01,1.1151e+02
+task26,old_arm,grip,0.06708,1.186612,-0.028,2.5205e-02,2.0231e+01

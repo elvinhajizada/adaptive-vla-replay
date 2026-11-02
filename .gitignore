@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+runs/
+outputs/
+wandb/
+slurm-*.out
+*.mp4
+*.gif
+!docs/**/*.gif
+.libero/
+requirements-lock.txt.bak

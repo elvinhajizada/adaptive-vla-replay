@@ -1,0 +1,65 @@
+condition,suite,task_id,n_episodes,success,order,step1,step1_share,step2,step2_share
+k14-b0,libero_90,23,50,6.0,demo,close white_cabinet_1_bottom_region,0.6,open white_cabinet_1_top_region,0.12
+k14-b1,libero_90,23,50,0.0,demo,close white_cabinet_1_bottom_region,0.02,open white_cabinet_1_top_region,0.0
+k14-b2,libero_90,23,50,16.0,demo,close white_cabinet_1_bottom_region,0.6,open white_cabinet_1_top_region,0.2
+k140-b0,libero_90,23,50,2.0,demo,close white_cabinet_1_bottom_region,0.62,open white_cabinet_1_top_region,0.02
+k140-b1,libero_90,23,50,12.0,demo,close white_cabinet_1_bottom_region,0.6,open white_cabinet_1_top_region,0.16
+kall-b0,libero_90,23,50,8.0,demo,close white_cabinet_1_bottom_region,0.8,open white_cabinet_1_top_region,0.12
+kall-b1,libero_90,23,50,32.0,demo,close white_cabinet_1_bottom_region,0.9,open white_cabinet_1_top_region,0.32
+theta0-E41,libero_10,2,50,54.0,demo,turnon flat_stove_1,1.0,on moka_pot_1 flat_stove_1_cook_region,0.54
+k14-b0,libero_10,2,50,0.0,demo,turnon flat_stove_1,0.48,on moka_pot_1 flat_stove_1_cook_region,0.0
+k14-b1,libero_10,2,50,0.0,demo,turnon flat_stove_1,0.26,on moka_pot_1 flat_stove_1_cook_region,0.0
+k14-b2,libero_10,2,50,0.0,demo,turnon flat_stove_1,0.2,on moka_pot_1 flat_stove_1_cook_region,0.0
+k140-b0,libero_10,2,50,6.0,demo,turnon flat_stove_1,0.34,on moka_pot_1 flat_stove_1_cook_region,0.16
+k140-b1,libero_10,2,50,14.0,demo,turnon flat_stove_1,0.56,on moka_pot_1 flat_stove_1_cook_region,0.14
+kall-b0,libero_10,2,50,56.0,demo,turnon flat_stove_1,0.94,on moka_pot_1 flat_stove_1_cook_region,0.56
+kall-b1,libero_10,2,50,64.0,demo,turnon flat_stove_1,0.9,on moka_pot_1 flat_stove_1_cook_region,0.64
+kp2.05-b0,libero_10,2,50,40.0,demo,turnon flat_stove_1,0.8,on moka_pot_1 flat_stove_1_cook_region,0.4
+theta0-113801,libero_10,3,50,82.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.92,close white_cabinet_1_bottom_region,0.86
+k14-b0,libero_10,3,50,0.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.1,close white_cabinet_1_bottom_region,0.0
+k14-b1,libero_10,3,50,0.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.3,close white_cabinet_1_bottom_region,0.0
+k14-b2,libero_10,3,50,10.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.38,close white_cabinet_1_bottom_region,0.12
+k140-b0,libero_10,3,50,40.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.76,close white_cabinet_1_bottom_region,0.4
+k140-b1,libero_10,3,50,30.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.48,close white_cabinet_1_bottom_region,0.3
+kall-b0,libero_10,3,50,82.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.9,close white_cabinet_1_bottom_region,0.9
+kall-b1,libero_10,3,50,76.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.84,close white_cabinet_1_bottom_region,0.76
+kp2.05-b0,libero_10,3,50,28.0,demo,in akita_black_bowl_1 white_cabinet_1_bottom_region,0.4,close white_cabinet_1_bottom_region,0.46
+theta0-E41,libero_10,9,50,42.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.48,close microwave_1,0.5
+k14-b0,libero_10,9,50,0.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.0,close microwave_1,0.0
+k14-b1,libero_10,9,50,0.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.0,close microwave_1,0.0
+k14-b2,libero_10,9,50,0.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.0,close microwave_1,0.08
+k140-b0,libero_10,9,50,0.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.14,close microwave_1,0.0
+k140-b1,libero_10,9,50,0.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.0,close microwave_1,0.0
+kall-b0,libero_10,9,50,20.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.28,close microwave_1,0.26
+kall-b1,libero_10,9,50,16.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.26,close microwave_1,0.2
+kp2.05-b0,libero_10,9,50,18.0,demo,in white_yellow_mug_1 microwave_1_heating_region,0.32,close microwave_1,0.18
+theta0-E47,libero_10,0,20,20.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.55,in tomato_sauce_1 basket_1_contain_region,0.25
+k140-b0,libero_10,0,20,0.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.6,in tomato_sauce_1 basket_1_contain_region,0.0
+k140-b1,libero_10,0,20,0.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.3,in tomato_sauce_1 basket_1_contain_region,0.0
+kall-b0,libero_10,0,20,0.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.2,in tomato_sauce_1 basket_1_contain_region,0.0
+kall-b1,libero_10,0,20,20.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.55,in tomato_sauce_1 basket_1_contain_region,0.2
+kp2.05-b0,libero_10,0,20,5.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.45,in tomato_sauce_1 basket_1_contain_region,0.05
+theta0-E47,libero_10,1,20,65.0,instruction,in cream_cheese_1 basket_1_contain_region,0.8,in butter_1 basket_1_contain_region,0.7
+k140-b0,libero_10,1,20,5.0,instruction,in cream_cheese_1 basket_1_contain_region,0.3,in butter_1 basket_1_contain_region,0.05
+k140-b1,libero_10,1,20,25.0,instruction,in cream_cheese_1 basket_1_contain_region,0.5,in butter_1 basket_1_contain_region,0.25
+kall-b0,libero_10,1,20,45.0,instruction,in cream_cheese_1 basket_1_contain_region,0.8,in butter_1 basket_1_contain_region,0.55
+kall-b1,libero_10,1,20,50.0,instruction,in cream_cheese_1 basket_1_contain_region,0.85,in butter_1 basket_1_contain_region,0.5
+kp2.05-b0,libero_10,1,20,20.0,instruction,in cream_cheese_1 basket_1_contain_region,0.6,in butter_1 basket_1_contain_region,0.2
+theta0-E47,libero_10,4,20,15.0,instruction,on porcelain_mug_1 plate_1,0.2,on white_yellow_mug_1 plate_2,0.2
+k140-b0,libero_10,4,20,5.0,instruction,on porcelain_mug_1 plate_1,0.1,on white_yellow_mug_1 plate_2,0.2
+k140-b1,libero_10,4,20,0.0,instruction,on porcelain_mug_1 plate_1,0.0,on white_yellow_mug_1 plate_2,0.05
+kall-b0,libero_10,4,20,30.0,instruction,on porcelain_mug_1 plate_1,0.45,on white_yellow_mug_1 plate_2,0.35
+kall-b1,libero_10,4,20,15.0,instruction,on porcelain_mug_1 plate_1,0.35,on white_yellow_mug_1 plate_2,0.25
+kp2.05-b0,libero_10,4,20,20.0,instruction,on porcelain_mug_1 plate_1,0.4,on white_yellow_mug_1 plate_2,0.2
+theta0-E47,libero_10,6,20,60.0,instruction,on porcelain_mug_1 plate_1,0.65,on chocolate_pudding_1 living_room_table_plate_right_region,0.8
+k140-b0,libero_10,6,20,10.0,instruction,on porcelain_mug_1 plate_1,0.65,on chocolate_pudding_1 living_room_table_plate_right_region,0.1
+k140-b1,libero_10,6,20,25.0,instruction,on porcelain_mug_1 plate_1,0.35,on chocolate_pudding_1 living_room_table_plate_right_region,0.35
+kall-b0,libero_10,6,20,20.0,instruction,on porcelain_mug_1 plate_1,0.3,on chocolate_pudding_1 living_room_table_plate_right_region,0.45
+kall-b1,libero_10,6,20,45.0,instruction,on porcelain_mug_1 plate_1,0.6,on chocolate_pudding_1 living_room_table_plate_right_region,0.6
+kp2.05-b0,libero_10,6,20,50.0,instruction,on porcelain_mug_1 plate_1,0.7,on chocolate_pudding_1 living_room_table_plate_right_region,0.55
+theta0-E47,libero_10,7,20,15.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.4,in cream_cheese_1 basket_1_contain_region,0.15
+k140-b0,libero_10,7,20,15.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.5,in cream_cheese_1 basket_1_contain_region,0.15
+k140-b1,libero_10,7,20,10.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.2,in cream_cheese_1 basket_1_contain_region,0.1
+kall-b0,libero_10,7,20,40.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.5,in cream_cheese_1 basket_1_contain_region,0.4
+kall-b1,libero_10,7,20,30.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.45,in cream_cheese_1 basket_1_contain_region,0.3
+kp2.05-b0,libero_10,7,20,5.0,instruction,in alphabet_soup_1 basket_1_contain_region,0.2,in cream_cheese_1 basket_1_contain_region,0.05

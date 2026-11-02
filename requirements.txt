@@ -1,0 +1,22 @@
+# Adaptive VLA V1 environment. Python 3.13.7, CUDA 12.6.
+# Build: scripts/build_env.sh (GPU machine, installs requirements-lock.txt; --relock rewrites
+# the lock from this file) or scripts/build_env_cpu.sh (CPU dev machine, derives CPU pins from the lock).
+#
+# LeRobot is pinned to the commit a community run reported working for SmolVLA +
+# LIBERO (0.6.2). It constrains: torch>=2.7,<2.12; torchvision<0.27; numpy<2.3;
+# transformers>=5.4,<5.6; hf-libero 0.1.x (robosuite==1.4.0, robomimic==0.2.0,
+# mujoco<3.9).
+#
+# Resolved with `pip install --dry-run` on 2026-09-25 (163 packages): torch 2.11.0+cu126,
+# torchvision 0.26.0+cu126, transformers 5.5.4, numpy 2.2.6, mujoco 3.8.1,
+# robosuite 1.4.0, peft 0.21.0. Not yet installed. After the M1 install, freeze the
+# result to requirements-lock.txt and treat that as the reproducible environment.
+
+--extra-index-url https://download.pytorch.org/whl/cu126
+
+torch==2.11.0+cu126
+torchvision==0.26.0+cu126
+lerobot[smolvla,libero,peft] @ git+https://github.com/huggingface/lerobot@9a6bb61043bac8c14353fcb6ea513b7473c118e3
+
+# tests (tests/test_spine.py needs only numpy + pytest)
+pytest

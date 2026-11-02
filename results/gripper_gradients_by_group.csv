@@ -1,0 +1,65 @@
+new_task,new_loss_part,group,adam_first_order_change_of_old_grip_loss
+task23,arm,readout,-0.0000e+00
+task23,arm,action_in_time,3.5544e+00
+task23,arm,state_proj,-2.5823e-02
+task23,arm,q_proj,3.8499e-01
+task23,arm,kv_self (even),2.3365e+00
+task23,arm,kv_cross (odd),9.0217e-01
+task23,arm,o_proj,3.7777e+00
+task23,arm,mlp,6.5797e+00
+task23,arm,layers 00-03,7.6955e+00
+task23,arm,layers 04-07,2.4044e+00
+task23,arm,layers 08-11,1.4865e+00
+task23,arm,layers 12-15,9.4913e-01
+task23,arm,layers 16-19,9.8693e-01
+task23,arm,layers 20-23,6.3762e-01
+task23,arm,layers 24-27,2.5895e-02
+task23,arm,layers 28-31,-2.0500e-01
+task23,grip,readout,-9.7661e-02
+task23,grip,action_in_time,-1.3391e-01
+task23,grip,state_proj,2.2091e-03
+task23,grip,q_proj,8.6771e-02
+task23,grip,kv_self (even),1.6550e-01
+task23,grip,kv_cross (odd),8.7349e-02
+task23,grip,o_proj,-2.6644e-01
+task23,grip,mlp,8.9473e-01
+task23,grip,layers 00-03,5.2184e-01
+task23,grip,layers 04-07,1.4956e-01
+task23,grip,layers 08-11,1.9778e-01
+task23,grip,layers 12-15,1.3988e-01
+task23,grip,layers 16-19,1.1848e-01
+task23,grip,layers 20-23,6.8257e-02
+task23,grip,layers 24-27,-4.2097e-02
+task23,grip,layers 28-31,-1.8580e-01
+task26,arm,readout,-0.0000e+00
+task26,arm,action_in_time,4.7441e+00
+task26,arm,state_proj,-7.2774e-02
+task26,arm,q_proj,1.2424e+00
+task26,arm,kv_self (even),5.2180e+00
+task26,arm,kv_cross (odd),2.7974e+00
+task26,arm,o_proj,5.4207e+00
+task26,arm,mlp,1.5921e+01
+task26,arm,layers 00-03,1.4064e+01
+task26,arm,layers 04-07,5.5187e+00
+task26,arm,layers 08-11,3.4513e+00
+task26,arm,layers 12-15,2.6525e+00
+task26,arm,layers 16-19,2.9757e+00
+task26,arm,layers 20-23,1.2722e+00
+task26,arm,layers 24-27,4.3937e-01
+task26,arm,layers 28-31,2.2610e-01
+task26,grip,readout,-7.3165e-02
+task26,grip,action_in_time,-1.1200e+00
+task26,grip,state_proj,-7.0047e-02
+task26,grip,q_proj,-1.6709e+00
+task26,grip,kv_self (even),-3.8524e+00
+task26,grip,kv_cross (odd),-1.4879e+00
+task26,grip,o_proj,-3.1125e+00
+task26,grip,mlp,-9.2534e+00
+task26,grip,layers 00-03,-3.7379e+00
+task26,grip,layers 04-07,-3.2078e+00
+task26,grip,layers 08-11,-3.0704e+00
+task26,grip,layers 12-15,-2.5200e+00
+task26,grip,layers 16-19,-2.5047e+00
+task26,grip,layers 20-23,-1.9797e+00
+task26,grip,layers 24-27,-1.6274e+00
+task26,grip,layers 28-31,-7.2914e-01

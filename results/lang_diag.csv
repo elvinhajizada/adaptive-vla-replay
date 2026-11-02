@@ -1,0 +1,13 @@
+run,condition,outcome,k,n,pct,ci95_lo,ci95_hi
+113027-r256,true,success,25,30,83.3,66.4,92.7
+113027-r256,true,own_goal,25,30,83.3,66.4,92.7
+113027-r256,true,partner_goal,0,30,0.0,0.0,11.4
+113027-r256,true,no_goal,5,30,16.7,7.3,33.6
+113027-r256,blank,success,0,30,0.0,0.0,11.4
+113027-r256,blank,own_goal,0,30,0.0,0.0,11.4
+113027-r256,blank,partner_goal,0,30,0.0,0.0,11.4
+113027-r256,blank,no_goal,30,30,100.0,88.6,100.0
+113027-r256,swapped,success,26,30,86.7,70.3,94.7
+113027-r256,swapped,own_goal,0,30,0.0,0.0,11.4
+113027-r256,swapped,partner_goal,26,30,86.7,70.3,94.7
+113027-r256,swapped,no_goal,4,30,13.3,5.3,29.7

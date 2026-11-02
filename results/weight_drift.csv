@@ -1,0 +1,37 @@
+label,checkpoint,group,params_M,rel_l2
+1k,train/113795/checkpoints/last,all,97.4,0.0587
+1k,train/113795/checkpoints/last,action expert (lm_expert),96.7,0.0592
+1k,train/113795/checkpoints/last,action_time_mlp_in.weight,0.5,0.0722
+1k,train/113795/checkpoints/last,action_time_mlp_out.weight,0.2,0.0314
+1k,train/113795/checkpoints/last,state_proj.weight,0.0,0.0125
+1k,train/113795/checkpoints/last,action_in_proj.weight,0.0,0.0158
+1k,train/113795/checkpoints/last,action_out_proj.weight,0.0,0.0174
+1k,train/113795/checkpoints/last,state_proj.bias,0.0,0.0213
+1k,train/113795/checkpoints/last,action_in_proj.bias,0.0,0.0099
+1k,train/113795/checkpoints/last,action_time_mlp_in.bias,0.0,0.0906
+1k,train/113795/checkpoints/last,action_time_mlp_out.bias,0.0,0.0227
+1k,train/113795/checkpoints/last,action_out_proj.bias,0.0,0.0087
+2k,train/113796/checkpoints/last,all,97.4,0.0861
+2k,train/113796/checkpoints/last,action expert (lm_expert),96.7,0.0864
+2k,train/113796/checkpoints/last,action_time_mlp_in.weight,0.5,0.1377
+2k,train/113796/checkpoints/last,action_time_mlp_out.weight,0.2,0.053
+2k,train/113796/checkpoints/last,state_proj.weight,0.0,0.0161
+2k,train/113796/checkpoints/last,action_in_proj.weight,0.0,0.0339
+2k,train/113796/checkpoints/last,action_out_proj.weight,0.0,0.0258
+2k,train/113796/checkpoints/last,state_proj.bias,0.0,0.027
+2k,train/113796/checkpoints/last,action_in_proj.bias,0.0,0.0184
+2k,train/113796/checkpoints/last,action_time_mlp_in.bias,0.0,0.1845
+2k,train/113796/checkpoints/last,action_time_mlp_out.bias,0.0,0.0324
+2k,train/113796/checkpoints/last,action_out_proj.bias,0.0,0.0137
+3k,train/113797/checkpoints/last,all,97.4,0.106
+3k,train/113797/checkpoints/last,action expert (lm_expert),96.7,0.1063
+3k,train/113797/checkpoints/last,action_time_mlp_in.weight,0.5,0.1922
+3k,train/113797/checkpoints/last,action_time_mlp_out.weight,0.2,0.0698
+3k,train/113797/checkpoints/last,state_proj.weight,0.0,0.0183
+3k,train/113797/checkpoints/last,action_in_proj.weight,0.0,0.0493
+3k,train/113797/checkpoints/last,action_out_proj.weight,0.0,0.0339
+3k,train/113797/checkpoints/last,state_proj.bias,0.0,0.0304
+3k,train/113797/checkpoints/last,action_in_proj.bias,0.0,0.0228
+3k,train/113797/checkpoints/last,action_time_mlp_in.bias,0.0,0.2532
+3k,train/113797/checkpoints/last,action_time_mlp_out.bias,0.0,0.0373
+3k,train/113797/checkpoints/last,action_out_proj.bias,0.0,0.0183
