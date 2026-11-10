@@ -10,82 +10,95 @@ bottom drawer of the cabinet and close it". Middle: after a single fine-tune (1,
 task 23 in the same kitchen, the same task from the same start fails. Right: the fine-tuned policy
 does task 23 itself (close the bottom drawer, open the top one). Played at about 1.5x real time.*
 
-We start from the released SmolVLA LIBERO checkpoint (θ0, `HuggingFaceVLA/smolvla_libero`, 605M
-parameters, trained on LIBERO-Spatial, Object, Goal and LIBERO-10), teach it five new LIBERO-90
-kitchen tasks one after another with its own fine-tuning recipe (action expert only), and re-test
-its old skills: LIBERO-Spatial (other scene), LIBERO-Goal (other scene, shared objects) and the
-LIBERO-10 tasks in and outside the new tasks' kitchens. Fine-tuning without replay is compared with
-random replay of θ0's own data and the earlier new tasks at budgets from 14 frames per task to
-every frame.
+Without replay, θ0 loses nearly all of its old skills: one fine-tune on one new task takes its
+success from about 75% to 0–27%, within 100 training steps in the run we tracked. Replaying part of
+its own training data alongside five new tasks keeps about four fifths of its LIBERO-Spatial and
+LIBERO-Goal success at 2% of the data and about a third at 0.2%, with no detectable loss when every
+frame is replayed. Its long two-step tasks keep least, and splitting the budget by task length
+roughly doubles what they keep.
 
-The full write-up, with methods, per-run tables, predictions and limitations, is
-**[docs/report.md](docs/report.md)**.
+We start from the released SmolVLA LIBERO checkpoint (θ0, `HuggingFaceVLA/smolvla_libero`, 605M
+parameters) and teach it five new LIBERO-90 kitchen tasks one after another with its own fine-tuning
+recipe (action expert only). Its old skills are re-tested on LIBERO-Spatial and LIBERO-Goal, in
+scenes no new task uses, and on LIBERO-10's two-step tasks: tasks 2, 3 and 9 in the new tasks'
+kitchens and tasks 0, 1, 4, 6 and 7 in living rooms. We call these evaluations probes. Fine-tuning
+without replay is compared with random replay of θ0's training data (the four LIBERO suites,
+judging by its normalizer statistics) and of the earlier new tasks, at budgets from 0.2% of the data
+to every frame. Earlier VLA studies replay the earlier tasks of a sequence or mix pretraining data
+into a single fine-tune; here a deployed model's own data is replayed through a sequence of new
+tasks.
+
+*Retention* is a run's final success on a probe divided by θ0's. A difference is *detectable* when
+its 95% interval over episodes excludes zero. The full write-up, with methods, per-run tables,
+predictions and limitations, is **[docs/report.md](docs/report.md)**.
 
 
 ## Findings
 
-1. **One fine-tune erases θ0's skills.** After learning a single new task, θ0's
-   old skills drop to 0–27% (from 74–84%); on the same-scene task, the only one tested during
-   training, the skill is gone by step 100, before the new task is learned. A 10x lower learning rate
-   does not prevent it.
-2. **Without replay, a sequence keeps only the last task.** Every earlier task, and every old θ0
-   skill, is at 0% after five stages.
-3. **Replaying θ0's own data protects it, and the budget sets how much.** After five new tasks:
+1. **One fine-tune erases θ0's skills.** After one new task, θ0's success on its old suites falls
+   from about 75% to 0–27%. On the two probes tracked during training (a kitchen LIBERO-10 task and
+   Spatial) the skills are gone by step 100, before the new task is learned. A 10x lower learning
+   rate does not prevent it.
+2. **Without replay, a sequence keeps only the last task.** After five new tasks every earlier task
+   and every old skill is at 0%.
+3. **Replaying θ0's own data protects it, and the budget sets how much.** Success after five new
+   tasks (a budget is the share of θ0's training data kept, split equally per task unless stated:
+   2% is 140 frames for each of its 40 tasks; the earlier new tasks get the same number):
 
-   | Replay budget (frames per task, share of the data) | Seeds | LIBERO-Spatial | LIBERO-Goal | LIBERO-10, same kitchens |
+   | Replay budget | Seeds | LIBERO-Spatial | LIBERO-Goal | LIBERO-10, kitchen tasks |
    |---|---|---|---|---|
    | θ0 (reference) | | 73.5% | 77% | 61% |
    | none | 1 | 0% | 0% | 0% |
-   | 14 (0.2%) | 3 | 14–37% | 13–31% | 0–3% |
-   | 140 (2%) | 2 | 59–63.5% | 54.5–64% | 15% |
+   | 0.2% | 3 | 14–37% | 13–31% | 0–3% |
+   | 2% | 2 | 59–63.5% | 54.5–64% | 15% |
+   | 2%, split by task length | 2 | 57–58% | 54.5–56.5% | 26–29% |
    | every frame | 2 | 71–75.5% | 69.5–74% | 52–53% |
 
-   The budget is a share of θ0's whole training set, split equally per task (at 2%, 6,160 frames for
-   44 tasks). 2% keeps about four fifths of θ0's Spatial and Goal success, 0.2% about a third.
-   Replaying every frame keeps Spatial and Goal at θ0's level (within 5.5 pts), so the model can hold
-   these skills while it learns; at small budgets it lacks data, not capacity. LIBERO-10 is the
-   exception: even with every frame it ends 8–9 pts below θ0, and its task 9 below half of θ0's level.
-4. **A tiny replay buffer costs new-task learning.** At 0.2% the five new tasks learn about 10 pts
-   less on average than without replay; from 2% up the average cost is inside the noise, though single
-   tasks can still lose up to 16 pts. The 14-frame buffer is memorized (its frames fit about 4.5x
-   tighter than θ0 itself fits them).
-5. **What 2% replay loses most is θ0's long, two-step (LIBERO-10) skills, in any scene.** They
-   keep a quarter of θ0's success, both in the new tasks' kitchens and in rooms they never touch.
-   No single step is to blame: the first step succeeds about half as often as under θ0, and after a
-   successful first step the second also succeeds about half as often, which leaves a quarter.
-   Replaying every frame brings both steps back on tasks 2 and 3, and about half of task 9.
-6. **How a budget is split matters for long tasks (one seed).** An equal split gives every task the
-   same number of frames, so a LIBERO-10 task, whose demos are twice as long, gets the thinnest slice
-   (1.4% of its frames, against 2.6–2.8% for Spatial and Goal). Splitting the same 2% by task
-   length about doubles LIBERO-10 retention (from 0.24 to 0.47) with no detectable cost on Spatial or
-   Goal. In the far scenes the second steps still lag, so coverage explains part of the loss, and
-   horizon or θ0's weaker hold on these tasks the rest. A second seed was stopped early, so this
-   rests on one sequence.
-7. **One new task is not kept by replay.** Task 23 (close the bottom drawer, open the top one), whose
-   demos never close the gripper, is lost at 0.2% and 2% and only partly kept with every frame (8
-   and 32% in two seeds).
-8. **Small details move the numbers a lot.** θ0 scores 76% on LIBERO-Spatial when the simulator
-   renders at 256x256, the size of its training images, and 64% at the default 360x360. The random
-   seed matters too: three runs at the 0.2% budget, differing only in which frames went into the
-   buffer and in training randomness, ended at 14, 19.5 and 37% on LIBERO-Spatial. Evaluating the
-   same model twice moves its score by only a few points, so the spread comes from training, not
-   from the evaluation. At that spread, even three seeds per budget detect only differences of about
-   30 pts, and the 2% and every-frame budgets have two.
+   ![Retention vs replay budget](docs/figures/fig11_m2_retention.png)
 
-![Retention vs replay budget](docs/figures/fig11_m2_retention.png)
+   *Retention after five new tasks, without replay and at the three equal-split budgets. Dots are
+   seeds, bars their mean.*
 
-*Retention (final success divided by θ0's) after five new tasks, for each replay budget and
-each suite of θ0's old skills. Dots are seeds, bars their mean.*
+   2% keeps about four fifths of θ0's Spatial and Goal success and 0.2% about a third. Every frame
+   shows no detectable loss on them: the model can keep these skills while it learns, so what the
+   smaller budgets lose is not explained by capacity alone. The long LIBERO-10 tasks are the
+   exception: even with every frame they end detectably below θ0 (retention 0.85). At 0.2% the loss
+   grows with every new task, so a test after one new task overstates what a small budget keeps.
+4. **A tiny buffer costs new-task learning.** At 0.2% the new tasks learn about 10 pts less than
+   without replay, although replay runs train twice as long, and the stored frames are memorized.
+   With an equal split, the average cost from 2% up is not detectable.
+5. **What 2% loses most is θ0's long, two-step tasks (LIBERO-10).** They keep a quarter of θ0's
+   success, in the new tasks' kitchens and in the living rooms alike. In the kitchens both steps fail
+   more often and the losses compound. Even with every frame, task 9 keeps under half.
+6. **Splitting the budget by task length helps the long tasks (two seeds).** An equal split gives a
+   LIBERO-10 task about half a demo's worth of frames. Splitting the same 2% in proportion to task
+   length raises kitchen LIBERO-10 success from 15% to 26–29% and living-room success from 7–12% to
+   16–20% (θ0: 35%), in both seeds; in the kitchens most of the gain is task 2, and task 3 ends lower.
+   Spatial, Goal and new-task learning show no detectable difference from the equal split, but
+   new-task learning is 5.4 pts below no replay, a detectable cost. Length may matter beyond
+   coverage: longer Spatial and Goal tasks also keep less, even after single fine-tunes without
+   replay (report, section 5).
+7. **One new task is not kept by replay.** Task 23, whose demos never close the gripper, is lost at
+   0.2% and 2% and only partly kept with every frame (8 and 32% success in two seeds).
+8. **At 0.2%, which frames are stored decides much of the result.** Three runs ended at 14, 19.5 and
+   37% on Spatial. Crossing the seeds shows the buffer seed (which frames are stored and how they
+   fill the batches) trades Spatial against Goal by 16 to 22 pts, while the training seed moves each
+   by under 5.
 
-Caveats that apply throughout: one checkpoint and one recipe, five new tasks in one order,
-LIBERO's fixed initial states (so retention of in-distribution behaviour, not general skill), and
-few seeds per condition. Every number in the report traces to a row of [results/](results/);
-[results/README.md](results/README.md) explains the columns, run labels and experiment ids.
+Caveats that apply throughout: one checkpoint and one recipe, five new tasks in one order, and
+LIBERO's fixed initial states (so retention of in-distribution behaviour, not general skill). In our
+pipeline θ0 scores below the SmolVLA paper (73.5 and 77% on Spatial and Goal, against 90 and 92%).
+Seeds are few: seed noise is estimated only at 0.2%, where three seeds detect only differences of
+about 30 pts on one suite but about 6 on the Spatial and Goal mean (seen after the results); for
+two-seed conditions we can only say whether both seeds agree. Every number in the report traces to
+a row of [results/](results/), except a few computed from per-episode outputs or dataset metadata
+(report, appendix A); [results/README.md](results/README.md) explains the columns, run labels and
+experiment ids.
 
-**Open questions.** At 2%, random frames already sample each step of the long tasks at its share of
-the data, so choosing frames within a task looks like a weak lever. What is left is how a fixed
-budget is split across tasks, the one new task that replay cannot keep, and methods that need no
-stored data. Fine-tuned checkpoints are not published yet.
+**Open questions.** Random buffers hold each step of the long tasks at its share of the demos;
+whether sampling a step above its share helps is untested. Also open: how a fixed budget is split
+across tasks and over the stages, what about task length makes a task fragile, the one new task
+that replay cannot keep, and methods that need no stored data.
 
 ## Reproducing
 
@@ -94,13 +107,37 @@ stored data. Fine-tuned checkpoints are not published yet.
 - Linux, an NVIDIA GPU with CUDA 12.6, Python 3.13 and cmake. All results come from one A100
   (80 GB) per job; we did not test smaller GPUs. A CPU-only machine runs the tests but is far too
   slow for evaluation.
-- About 2.4 GB of RAM per simulated episode: a 50-episode evaluation batch needs about 120 GB, and
-  the launchers request 160 GB.
+- About 2.4 GB of RAM per simulated episode. The protocol runs all episodes of a task at once, so a
+  50-episode evaluation needs about 120 GB (the launchers request 160 GB); smaller batches would
+  change the protocol.
 - About 30 GB of disk for models, data and the Python environment.
-- Compute: [docs/report.md](docs/report.md), appendix A, gives it per experiment. The cheapest check
-  of the main effect is θ0's reference and the single fine-tune in step 5.
-- Slurm for the launchers (`*.sbatch`), or one machine with `scripts/run_local.sh` in place of
-  `sbatch` (see "Running without Slurm").
+- Compute: one replay sequence (five stages and its final probes) takes 6–7 A100-hours. The
+  cheapest check of the main effect is θ0's reference and the single fine-tune in step 5.
+  Fine-tuned checkpoints are not published yet, so every result needs its training runs.
+- Slurm, or one machine with `scripts/run_local.sh` in place of `sbatch` (next section).
+
+### Slurm or a single machine
+
+The launchers (`*.sbatch`) carry the resource requests the runs used and a placeholder partition.
+On Slurm, set yours once per shell; the chain scripts pass it on to every job they submit:
+
+```bash
+export SBATCH_PARTITION=<your-partition>   # also SBATCH_ACCOUNT, SBATCH_QOS if your site needs them
+```
+
+Submit from the repository root, or set `AVLA_REPO`. Every batch job starts `scripts/memguard.py`,
+which kills the job at 90% of its `--mem` request, for sites that do not enforce memory limits.
+
+On one machine with a GPU, `scripts/run_local.sh` stands in for `sbatch`: it runs a launcher right
+away and returns when it has finished, so a chain's jobs run one after another (logs in
+`slurm-<job>.out` here). No memory watchdog runs. The replay stages also evaluate along the way, up
+to about 145 GB at once; `AVLA_STAGE_PROBES=0` skips those evaluations, and the final probes still
+run. We have tested this path's plumbing, not a full run.
+
+```bash
+export AVLA_SBATCH=scripts/run_local.sh                     # the chain scripts in step 5 now run here
+bash scripts/run_local.sh scripts/convert_libero90.sbatch   # a single launcher: replace "sbatch"
+```
 
 ### 1. Install
 
@@ -144,45 +181,13 @@ sbatch --dependency=afterok:${j%%;*} scripts/convert_theta0_suites.sbatch   # θ
 
 ### 5. Reproduce the results
 
-Each experiment is a chain of Slurm jobs: one job per training stage, then a job for the final
-probes: the evaluations that measure what was kept (all LIBERO-Spatial and LIBERO-Goal tasks,
-LIBERO-10 tasks 2, 3 and 9, and the earlier new tasks). A chain script submits the whole chain at
-once from wherever you call `sbatch`; each job starts when the previous one has finished (without
-Slurm, see "Running without Slurm" below).
-Training runs are written to `$AVLA_RUNS/train/<job>/`, evaluations to
-`$AVLA_RUNS/eval/<suite>/<job>-<label>-r256/` (r256: the render size).
+Each experiment is a chain of jobs: one per training stage, then one for the final probes (all
+Spatial and Goal tasks, the kitchen LIBERO-10 tasks and the earlier new tasks). A chain script
+submits the whole chain at once; each job starts when the previous one has finished. Training runs
+are written to `$AVLA_RUNS/train/<job>/`, evaluations to `$AVLA_RUNS/eval/<suite>/<job>-<label>-r256/`
+(r256: the render size). In order of cost:
 
-**Replay.** One run teaches θ0 the five new tasks in order, replaying stored frames alongside each
-one, and ends with the final probes:
-
-```bash
-bash experiments/replay/er_seed_chain.sh K BUFFER_SEED TRAINING_SEED
-```
-
-- `K`: frames kept per task in the replay buffer: `14` (0.2% of θ0's data), `140` (2%) or `all`.
-- `BUFFER_SEED`: decides which frames are drawn into the buffer.
-- `TRAINING_SEED`: everything else that is random in training, such as the batch order and the
-  noise drawn for the training loss.
-
-Runs differ for two reasons: which frames were stored, and the randomness of training itself. The
-two seeds are separate so that each can be varied with the other held fixed. The report's runs
-change both together (0 and 1000, 1 and 1001, 2 and 1002; seeds 1, 2 and 3 in the report), so their
-spread mixes the two:
-
-```bash
-for s in "0 1000" "1 1001" "2 1002"; do bash experiments/replay/er_seed_chain.sh 14 $s; done
-for s in "0 1000" "1 1001"; do bash experiments/replay/er_seed_chain.sh 140 $s; done
-for s in "0 1000" "1 1001"; do bash experiments/replay/er_seed_chain.sh all $s; done
-bash experiments/replay/e50_prop_chain.sh      # 2%, split by task length instead of equally
-```
-
-**No replay**: the same five tasks with plain fine-tuning, training seed 1000.
-
-```bash
-bash experiments/replay/seq_chain.sh
-```
-
-**θ0's reference**: θ0 itself on the same final probes, the baseline for every retention number.
+**θ0's reference**: θ0 itself on the final probes, the baseline for every retention number.
 
 ```bash
 sbatch scripts/probe_eval.sbatch \
@@ -200,8 +205,38 @@ sbatch scripts/probe_eval.sbatch "$AVLA_RUNS/train/$JOB/checkpoints/last/pretrai
     ft23 "libero_10:[3]:50" libero_spatial:all:10 libero_goal:all:10
 ```
 
-**Everything else**: [results/README.md](results/README.md) lists, for each section of the report,
-the launcher and the run labels in `results/runs.csv`.
+**No replay**: the same five tasks with plain fine-tuning, training seed 1000.
+
+```bash
+bash experiments/replay/seq_chain.sh
+```
+
+**Replay.** One run teaches θ0 the five new tasks in order, replaying stored frames alongside each
+one, and ends with the final probes:
+
+```bash
+bash experiments/replay/er_seed_chain.sh K BUFFER_SEED TRAINING_SEED
+```
+
+- `K`: frames kept per task: `14` (0.2% of θ0's data), `140` (2%) or `all`.
+- `BUFFER_SEED`: which frames are stored, which of them fill each batch, and the order of the new
+  task's frames.
+- `TRAINING_SEED`: the rest of training's randomness, mainly the noise and time draws of the
+  flow-matching loss.
+
+Separate seeds let either be varied with the other fixed. The report's runs change both together
+(0/1000, 1/1001 and 2/1002, its seeds 1 to 3):
+
+```bash
+for s in "0 1000" "1 1001" "2 1002"; do bash experiments/replay/er_seed_chain.sh 14 $s; done
+for s in "0 1000" "1 1001"; do bash experiments/replay/er_seed_chain.sh 140 $s; done
+for s in "0 1000" "1 1001"; do bash experiments/replay/er_seed_chain.sh all $s; done
+for s in "0 1000" "1 1001"; do bash experiments/replay/e50_prop_chain.sh $s; done   # 2%, split by task length
+```
+
+**Everything else** (the crossed seeds, the fresh buffer, the living-room probes and the analyses):
+[results/README.md](results/README.md) lists, for each section of the report, the launcher, its
+arguments, and the run labels in `results/runs.csv`.
 
 **Tables and figures.** The figure script draws the report's figures from the CSVs shipped in
 `results/`; it selects our runs by their job ids. The collector gathers your runs into the same
@@ -211,38 +246,6 @@ tables, in a directory of your choice, to compare with ours:
 python scripts/make_figures.py                       # docs/figures/ from results/*.csv
 python scripts/collect_results.py --out my_results   # your runs under $AVLA_RUNS as CSV tables
 ```
-
-### Running on Slurm
-
-The launchers (`*.sbatch`) carry the resource requests the runs used (GPU, CPUs, memory, time) and
-a placeholder partition. Set yours once per shell, and the chain scripts pass it on to every job
-they submit (Slurm's environment variables override the launchers' `#SBATCH` lines):
-
-```bash
-export SBATCH_PARTITION=<your-partition>   # also SBATCH_ACCOUNT, SBATCH_QOS if your site needs them
-```
-
-Submit from the repository root, or set `AVLA_REPO`. Every batch job starts
-`scripts/memguard.py`, which kills the job at 90% of its `--mem` request, for sites that do not
-enforce memory limits.
-
-### Running without Slurm
-
-On a single machine with a GPU, `scripts/run_local.sh` stands in for `sbatch`: it runs a launcher
-right away and returns when it has finished, so the jobs of a chain run one after another.
-
-```bash
-export AVLA_SBATCH=scripts/run_local.sh       # the chain scripts in step 5 now run here
-bash scripts/run_local.sh scripts/convert_libero90.sbatch    # any single launcher: replace "sbatch"
-```
-
-Logs go to `slurm-<job>.out` in the current directory. Evaluation is the limit on one machine: the
-protocol runs all episodes of a task at once, one simulator process each, so a 50-episode task
-needs about 120 GB of RAM. Evaluating in smaller batches changes the protocol the reported numbers
-used. The replay stages also evaluate several probes at once along the way (up to 60 processes,
-about 145 GB). `export AVLA_STAGE_PROBES=0` skips those: the final probes still run, but the
-measurements along the sequence (retention after each stage, and how each new task is forgotten as
-later ones are learned) are then missing. No memory watchdog runs here. We have tested this path's plumbing, not a full run on a local GPU.
 
 ## Pitfalls this repo handles
 

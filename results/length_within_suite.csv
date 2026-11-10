@@ -1,0 +1,5 @@
+suite,target,n_tasks,rho,perm_p,n_at_zero
+libero_spatial,replay_mean,10,-0.83,0.0044,0
+libero_spatial,single_mean,10,-0.628,0.059,0
+libero_goal,replay_mean,10,-0.552,0.1023,0
+libero_goal,single_mean,10,-0.86,0.0033,5

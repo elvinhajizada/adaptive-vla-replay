@@ -37,6 +37,7 @@ RUNS = {   # condition: training job of each stage (stage 1 first)
 # Final probes and just-learned evals only (no per-stage probes, so no NBT or normalized forgetting).
 RUNS_FINAL_ONLY = {
     "ER p2.05 b0": [115873, 115874, 115875, 115876, 115877],   # E50, 2.05% of every task's frames
+    "ER p2.05 b1": [115941, 115942, 116051, 116052, 116053],   # E51, its second seed (resumed at stage 3)
 }
 T975 = {1: 12.706, 2: 4.303, 3: 3.182}   # t(0.975, df)
 PROBES = [("libero_spatial", None), ("libero_goal", None), ("libero_10", {2, 3, 9})]
@@ -81,6 +82,8 @@ def report_rows(cells, theta0, rng):
     budgets = defaultdict(list)                        # "ER k14" -> [(seed label, jobs)]
     # Conditions added later draw from their own generator, so earlier intervals stay as published.
     rng_extra = np.random.default_rng(2)
+    # A seed added to such a condition later (E51) draws from a third one, for the same reason.
+    rng_later, later = np.random.default_rng(3), {("ER p2.05", "b1")}
     extra = {c.rsplit(" ", 1)[0] for c in RUNS_FINAL_ONLY}
     for cond, jobs in {**RUNS, **RUNS_FINAL_ONLY}.items():
         if cond != "Sequential":
@@ -96,7 +99,7 @@ def report_rows(cells, theta0, rng):
                 vecs = [ones(*cells[(jobs[-1], suite, t, True)]) for t in range(10)
                         if (ids is None or t in ids) and cells[(jobs[-1], suite, t, True)][1]]
                 p = np.mean(np.concatenate(vecs))
-                g = rng_extra if budget in extra else rng
+                g = rng_later if (budget, seed) in later else rng_extra if budget in extra else rng
                 d = np.array([boot_mean(vecs, g) for _ in range(N_BOOT)])
                 n = sum(map(len, vecs))
                 n_all += n

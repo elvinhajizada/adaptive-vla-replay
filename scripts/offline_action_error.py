@@ -19,6 +19,9 @@ Usage: python scripts/offline_action_error.py [--csv=OUT.csv] [--frames=NAME=JSO
 --frames adds a frame set of the merged replay dataset (libero_all_theta0, θ0 conventions): JSON is a
   list of [row index, episode end row, instruction] (experiments/replay/buffer_memorization.py, E44);
   --only-frames drops the four fixed sets above.
+--task-frames adds spatial_t and goal_t: per task 4 demos x 7 frames at 5, 20, ..., 95% of each demo's
+  length (the fixed sets above stop at frame 90, before the end of the longer tasks), and
+  --per-task-csv=OUT.csv writes one row per (model, frame set, task) (E57).
 POLICY_DIR may be slim (adaptive_vla.checkpoints); it is materialized to a temp dir and removed.
 """
 import json
@@ -46,7 +49,8 @@ st = {k: torch.as_tensor(v) for k, v in load_theta0_stats(THETA0).items()}
 a_std = st["action.std"]
 
 
-def frame_set(root, nvidia, tasks_filter, n_demos, frames):
+def frame_set(root, nvidia, tasks_filter, n_demos, frames, relative=False):
+    """frames: step indices, or with relative=True fractions of each demo's length."""
     ds = open_dataset(root)
     eps, picks = ds.meta.episodes, {}
     for i in range(len(eps)):
@@ -59,7 +63,7 @@ def frame_set(root, nvidia, tasks_filter, n_demos, frames):
     obs, acts, tasks = [], [], []
     for t, lst in sorted(picks.items()):
         for start, n in lst:
-            for f in frames:
+            for f in ([int(x * (n - 1)) for x in frames] if relative else frames):
                 if f >= n:
                     continue
                 s = ds[start + f]
@@ -95,6 +99,10 @@ SETS = {} if "--only-frames" in ARGS else {
     "l10_s4": frame_set(f"{NV}/libero_10", True, {L10_S4}, 6, (0, 40, 80, 120, 160, 200)),
     "task23": frame_set(CONV, False, {T23}, 6, (0, 40, 80, 120, 160, 200)),
 }
+if "--task-frames" in ARGS:
+    FRACS = (0.05, 0.2, 0.35, 0.5, 0.65, 0.8, 0.95)
+    SETS["spatial_t"] = frame_set(f"{NV}/libero_spatial", True, None, 4, FRACS, relative=True)
+    SETS["goal_t"] = frame_set(f"{NV}/libero_goal", True, None, 4, FRACS, relative=True)
 for a in ARGS:
     if a.startswith("--frames="):
         name, path = a.split("=", 2)[1:]
@@ -154,4 +162,17 @@ if CSV_OUT:
             for k, (_, acts, _) in SETS.items():
                 d, z = err(preds[label][k], acts), err(preds[label][k], preds["theta0"][k])
                 w.writerow([label, k] + [round(d[g], 4) for g in GROUPS] + [round(z[g], 4) for g in GROUPS])
+PER_TASK = next((a.split("=", 1)[1] for a in ARGS if a.startswith("--per-task-csv=")), None)
+if PER_TASK:
+    import csv
+    with open(PER_TASK, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["label", "frame_set", "task", "n_frames"] + [f"vs_{r}_{g}" for r in ("demo", "theta0") for g in GROUPS])
+        for label, _ in models:
+            for k, (_, acts, tasks) in SETS.items():
+                for t in sorted(set(tasks)):
+                    ix = torch.tensor([i for i, x in enumerate(tasks) if x == t])
+                    d = err(preds[label][k][ix], acts[ix])
+                    z = err(preds[label][k][ix], preds["theta0"][k][ix])
+                    w.writerow([label, k, t, len(ix)] + [round(d[g], 4) for g in GROUPS] + [round(z[g], 4) for g in GROUPS])
 print("OFFLINE ACTION ERROR DONE")

@@ -1,9 +1,10 @@
-"""E48b: are the step-2 frames of LIBERO-10 tasks 2, 3, 9 under-represented in the k = 140 buffers? (CPU)
+"""E48b: are the step-2 frames of LIBERO-10 tasks under-represented in the replay buffers? (CPU)
 
   python experiments/replay/phase_coverage.py SPEC [SPEC ...]      SPEC = label=path/to/stage-5 replay spec
 
 Step 2 is read off the gripper (θ0 convention, action[6] < 0 open, > 0 closed), per demo:
-  - tasks 3 and 9 (put X in, then close): rows after the first grasp-and-release (second toggle);
+  - tasks 3 and 9 (put X in, then close) and the living-room tasks 0, 1, 4, 6, 7 (two pick-and-place
+    steps): rows after the first grasp-and-release (second toggle), in demo order;
   - task 2 (turn on the stove, then the moka pot): rows from the last closing of the gripper.
 Prints the toggle-count distribution (to check the rule fits the demos), the step-2 share of all
 demo frames, and per buffer the step-2 share and count among its frames and the demos it covers.
@@ -26,7 +27,12 @@ OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
                    "results", "phase_coverage.csv")
 TASKS = {2: "turn on the stove and put the moka pot on it",
          3: "put the black bowl in the bottom drawer of the cabinet and close it",
-         9: "put the yellow and white mug in the microwave and close it"}
+         9: "put the yellow and white mug in the microwave and close it",
+         0: "put both the alphabet soup and the tomato sauce in the basket",
+         1: "put both the cream cheese box and the butter in the basket",
+         4: "put the white mug on the left plate and put the yellow and white mug on the right plate",
+         6: "put the white mug on the plate and put the chocolate pudding to the right of the plate",
+         7: "put both the alphabet soup and the cream cheese box in the basket"}
 
 
 def step2_rows(task, rows, grip):

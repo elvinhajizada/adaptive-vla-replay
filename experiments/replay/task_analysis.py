@@ -27,8 +27,8 @@ import numpy as np
 # Stage-5 training job -> condition (E37, E39, E42, E43, E46).
 FINAL = {"115623": "k14-b0", "115630": "k14-b1", "115636": "k14-b2", "115761": "k140-b0",
          "115790": "k140-b1", "115795": "kall-b0", "115819": "kall-b1"}
-# E50 (proportional 2.05% split): failure anatomy only, kept out of the margin analysis.
-ANATOMY_ONLY = {"115877": "kp2.05-b0"}
+# E50 and E51 (proportional 2.05% split, two seeds): failure anatomy only, kept out of the margin analysis.
+ANATOMY_ONLY = {"115877": "kp2.05-b0", "116053": "kp2.05-b1"}
 # Goal predicates of the two-step tasks in the order the demos achieve them.
 STEPS = {
     ("libero_90", 23): ["close white_cabinet_1_bottom_region", "open white_cabinet_1_top_region"],

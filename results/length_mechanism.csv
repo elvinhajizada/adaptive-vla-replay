@@ -1,0 +1,21 @@
+suite,task_id,task,demo_frames,theta0_setup,single_mean,replay_mean,mean_arm_drift,noise_success_s0.5,noise_success_s1,noise_success_s2,noise_tolerance
+libero_goal,0,open the middle drawer of the cabinet,140.0,0.65,0.0,0.663,0.4202,0.5,0.6,0.0,0.564
+libero_goal,1,put the bowl on the stove,101.1,0.9,0.037,0.556,0.2233,0.6,0.5,0.0,0.407
+libero_goal,2,put the wine bottle on top of the cabinet,106.5,0.75,0.089,0.661,0.3395,1.0,0.6,0.2,0.8
+libero_goal,3,open the top drawer and put the bowl inside,198.8,0.45,0.0,0.482,0.2861,0.1,0.0,0.0,0.074
+libero_goal,4,put the bowl on top of the cabinet,99.4,0.95,0.281,0.774,0.2918,0.9,0.6,0.2,0.596
+libero_goal,5,push the plate to the front of the stove,151.2,0.75,0.0,0.467,0.2693,0.7,0.1,0.0,0.356
+libero_goal,6,put the cream cheese in the bowl,105.1,0.7,0.0,0.244,0.2418,0.3,0.3,0.0,0.286
+libero_goal,7,turn on the stove,89.1,1.0,0.567,0.721,0.3425,1.0,0.8,0.4,0.733
+libero_goal,8,put the bowl on the plate,93.1,0.8,0.25,0.803,0.2636,0.9,0.6,0.0,0.625
+libero_goal,9,put the wine bottle on the rack,172.9,0.65,0.0,0.667,0.3987,0.4,0.2,0.1,0.359
+libero_spatial,0,pick up the black bowl between the plate and the ramekin and place it on the plate,99.7,0.5,0.533,1.175,0.3358,0.5,0.4,0.1,0.667
+libero_spatial,1,pick up the black bowl next to the ramekin and place it on the plate,132.0,0.8,0.042,0.682,0.2624,0.8,0.4,0.1,0.542
+libero_spatial,2,pick up the black bowl from table center and place it on the plate,116.2,1.0,0.233,0.73,0.2235,1.0,0.5,0.0,0.5
+libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,99.7,0.8,0.083,0.75,0.2499,0.5,0.2,0.0,0.292
+libero_spatial,4,pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate,149.0,0.8,0.042,0.455,0.2718,0.8,0.6,0.3,0.708
+libero_spatial,5,pick up the black bowl on the ramekin and place it on the plate,114.7,0.6,0.389,0.661,0.2868,0.5,0.5,0.1,0.611
+libero_spatial,6,pick up the black bowl next to the cookie box and place it on the plate,125.5,0.7,0.095,0.495,0.266,0.5,0.2,0.1,0.381
+libero_spatial,7,pick up the black bowl on the stove and place it on the plate,135.6,1.0,0.067,0.579,0.2567,0.8,0.5,0.1,0.467
+libero_spatial,8,pick up the black bowl next to the plate and place it on the plate,118.5,0.9,0.037,0.714,0.3007,0.8,0.6,0.0,0.519
+libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,138.5,0.5,0.067,0.561,0.3287,0.4,0.5,0.1,0.667

@@ -65,3 +65,26 @@ run,dataset_task_index,task,steps,schedule_steps,optimizer,batch_size,passes,tas
 115875,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,p2.05,0.5,5907,2322.9,0,1000,train/115874/checkpoints/last,default (1e-4),all,000100;001010;002021,1394,a22613f68d
 115876,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,p2.05,0.5,6073,2388.2,0,1000,train/115875/checkpoints/last,default (1e-4),all,000100;001146;002293,1583,edeadf676c
 115877,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,p2.05,0.5,6261,2462.1,0,1000,train/115876/checkpoints/last,default (1e-4),all,000100;000687;001374,1014,1ee2ebaf93
+115941,5,put the wine bottle in the bottom drawer of the cabinet,1328,1328,adamw,64,8.0,5309,p2.05,0.5,5608,2205.3,1,1001,theta0,default (1e-4),all,000100;000664;001328,1011,c8ee460f82
+115942,22,put the frying pan on the stove,2322,2322,adamw,64,8.0,9287,p2.05,0.5,5717,2248.2,1,1001,train/115941/checkpoints/last,default (1e-4),all,000100;001161;002322,1569,934845d515
+116051,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,p2.05,0.5,5907,2322.9,1,1001,train/115942/checkpoints/last,default (1e-4),all,000100;001010;002021,1447,c3325c6ecf
+116052,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,p2.05,0.5,6073,2388.2,1,1001,train/116051/checkpoints/last,default (1e-4),all,000100;001146;002293,1587,c3325c6ecf
+116053,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,p2.05,0.5,6261,2462.1,1,1001,train/116052/checkpoints/last,default (1e-4),all,000100;000687;001374,1006,c3325c6ecf
+116065,5,put the wine bottle in the bottom drawer of the cabinet,1328,1328,adamw,64,8.0,5309,14,0.5,560,220.2,0,1001,theta0,default (1e-4),all,000100;000664;001328,925,d342b9aad7
+116066,22,put the frying pan on the stove,2322,2322,adamw,64,8.0,9287,14,0.5,574,225.7,0,1001,train/116065/checkpoints/last,default (1e-4),all,000100;001161;002322,1548,b9d5ebfa25
+116067,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,14,0.5,588,231.2,0,1001,train/116066/checkpoints/last,default (1e-4),all,000100;001010;002021,1379,b9d5ebfa25
+116068,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,14,0.5,602,236.7,0,1001,train/116067/checkpoints/last,default (1e-4),all,000100;001146;002293,1537,b9d5ebfa25
+116069,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,14,0.5,616,242.2,0,1001,train/116068/checkpoints/last,default (1e-4),all,000100;000687;001374,963,b9d5ebfa25
+116071,5,put the wine bottle in the bottom drawer of the cabinet,1328,1328,adamw,64,8.0,5309,14,0.5,560,220.2,1,1000,theta0,default (1e-4),all,000100;000664;001328,965,a6d3a122a4
+116072,22,put the frying pan on the stove,2322,2322,adamw,64,8.0,9287,14,0.5,574,225.7,1,1000,train/116071/checkpoints/last,default (1e-4),all,000100;001161;002322,1562,b9d5ebfa25
+116073,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,14,0.5,588,231.2,1,1000,train/116072/checkpoints/last,default (1e-4),all,000100;001010;002021,1385,b9d5ebfa25
+116074,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,14,0.5,602,236.7,1,1000,train/116073/checkpoints/last,default (1e-4),all,000100;001146;002293,1532,b9d5ebfa25
+116075,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,14,0.5,616,242.2,1,1000,train/116074/checkpoints/last,default (1e-4),all,000100;000687;001374,970,b9d5ebfa25
+116078,22,put the frying pan on the stove,2322,2322,adamw,64,8.0,9287,14,0.5,574,225.7,0,1000,train/115608/checkpoints/last,default (1e-4),all,000100;001161;002322,1546,7d26210fa8
+116079,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,14,0.5,588,231.2,0,1000,train/116078/checkpoints/last,default (1e-4),all,000100;001010;002021,1380,b9d5ebfa25
+116080,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,14,0.5,602,236.7,0,1000,train/116079/checkpoints/last,default (1e-4),all,000100;001146;002293,1536,b9d5ebfa25
+116081,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,14,0.5,616,242.2,0,1000,train/116080/checkpoints/last,default (1e-4),all,000100;000687;001374,958,b9d5ebfa25
+116083,22,put the frying pan on the stove,2322,2322,adamw,64,8.0,9287,14,0.5,574,225.7,1,1001,train/115626/checkpoints/last,default (1e-4),all,000100;001161;002322,1563,b9d5ebfa25
+116084,13,close the bottom drawer of the cabinet and open the top drawer,2021,2021,adamw,64,8.0,8081,14,0.5,588,231.2,1,1001,train/116083/checkpoints/last,default (1e-4),all,000100;001010;002021,1391,b9d5ebfa25
+116085,8,put the wine bottle on the wine rack,2293,2293,adamw,64,8.0,9169,14,0.5,602,236.7,1,1001,train/116084/checkpoints/last,default (1e-4),all,000100;001146;002293,1565,b9d5ebfa25
+116086,20,put the yellow and white mug to the front of the white mug,1374,1374,adamw,64,8.0,5493,14,0.5,616,242.2,1,1001,train/116085/checkpoints/last,default (1e-4),all,000100;000687;001374,952,b9d5ebfa25

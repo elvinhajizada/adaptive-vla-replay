@@ -7,7 +7,9 @@ then close it; mug in the microwave, then close it), so step 2's share falls whe
 This compares retention of step 1, P(step 1), with retention of step 2 given step 1, P(step 2 |
 step 1), per episode from each final probe's subgoals.jsonl (end-of-episode predicates). If small
 budgets only lose step 1 more often and the loss compounds, the two retentions agree; a loss specific
-to step 2 shows as a lower conditional retention. Far-scene tasks (E47) use instruction order; their
+to step 2 shows as a lower conditional retention. Also writes n_step1 (episodes with step 1 at the end) and
+step2_without_step1, the share of episodes that end with step 2 but not step 1: the decomposition
+assumes nesting, and this column shows where it fails. Far-scene tasks (E47) use instruction order; their
 two goals can be reached in either order, so there the conditional reads as "the other goal, once
 one is reached".
 
@@ -25,15 +27,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 EVAL = os.path.join(os.environ.get("AVLA_RUNS", ""), "eval", "libero_10")
 OUT = os.path.join(ROOT, "results", "step_conditional.csv")
 KITCHEN, FAR = (2, 3, 9), (0, 1, 4, 6, 7)
-# Final-probe eval runs per condition (seeds pooled): kitchen tasks 2, 3, 9 and far-scene tasks (E47, E50).
+# Final-probe eval runs per condition (seeds pooled): kitchen tasks 2, 3, 9 and far-scene tasks (E47, E50, E51).
 RUNS = {
     "theta0": {"kitchen": ["115785-theta0-final-r256", "113801-r256"], "far": ["115841-e47-farscene-theta0-r256"]},
     "k14": {"kitchen": ["115638-er14-s5-final-redo-r256", "115639-er-k14-b1-t1001-s5-final-r256",
                         "115640-er-k14-b2-t1002-s5-final-r256"], "far": []},
     "k140": {"kitchen": ["115762-er-k140-b0-t1000-s5-final-r256", "115791-er-k140-b1-t1001-s5-final-r256"],
              "far": ["115842-e47-farscene-k140-b0-r256", "115843-e47-farscene-k140-b1-r256"]},
-    "p2.05": {"kitchen": ["115878-er-kp2.05-b0-t1000-s5-final-r256"],
-              "far": ["115879-er-kp2.05-b0-t1000-s5-final-far-r256"]},
+    "p2.05": {"kitchen": ["115878-er-kp2.05-b0-t1000-s5-final-r256", "116054-er-kp2.05-b1-t1001-s5-final-r256"],
+              "far": ["115879-er-kp2.05-b0-t1000-s5-final-far-r256", "116055-er-kp2.05-b1-t1001-s5-final-far-r256"]},
     "kall": {"kitchen": ["115796-er-kall-b0-t1000-s5-final-r256", "115820-er-kall-b1-t1001-s5-final-r256"],
              "far": ["115844-e47-farscene-kall-b0-r256", "115845-e47-farscene-kall-b1-r256"]},
 }
@@ -81,7 +83,7 @@ def stats(cs, task=None):
     s1, s2 = x[:, 0].mean(), x[:, 1].mean()
     both = (x[:, 0] & x[:, 1]).sum()
     s21 = both / x[:, 0].sum() if x[:, 0].sum() else np.nan
-    return len(x), s1, s2, s21
+    return len(x), s1, s2, s21, int(x[:, 0].sum()), (x[:, 1] & ~x[:, 0]).mean()
 
 
 def resample(cs, rng):
@@ -99,16 +101,17 @@ def main() -> None:
             if not cs:
                 continue
             for task in [None, *tasks]:
-                n, s1, s2, s21 = stats(cs, task)
-                _, r1_, r2_, r21_ = stats(ref, task)
+                n, s1, s2, s21, n1, s2_not1 = stats(cs, task)
+                _, r1_, r2_, r21_, _, _ = stats(ref, task)
                 rec = {"group": group, "task": "pooled" if task is None else task, "condition": cond, "n_episodes": n,
-                       "step1": round(s1, 3), "step2": round(s2, 3), "step2_given_step1": round(s21, 3)}
+                       "step1": round(s1, 3), "step2": round(s2, 3), "step2_given_step1": round(s21, 3),
+                       "n_step1": n1, "step2_without_step1": round(s2_not1, 3)}
                 if cond != "theta0":
                     pt = (s1 / r1_, s21 / r21_ if r21_ else np.nan)
                     draws = []
                     for _ in range(N_BOOT):
-                        _, b1, _, b21 = stats(resample(cs, rng), task)
-                        _, c1, _, c21 = stats(resample(ref, rng), task)
+                        _, b1, _, b21, _, _ = stats(resample(cs, rng), task)
+                        _, c1, _, c21, _, _ = stats(resample(ref, rng), task)
                         draws.append((b1 / c1 if c1 else np.nan, b21 / c21 if c21 else np.nan))
                     d = np.array(draws, dtype=float)
                     lo, hi = np.nanpercentile(d, 2.5, axis=0), np.nanpercentile(d, 97.5, axis=0)

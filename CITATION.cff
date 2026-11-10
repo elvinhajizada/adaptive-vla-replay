@@ -5,14 +5,15 @@ type: software
 authors:
   - family-names: Hajizada
     given-names: Elvin
-version: "1.0"
-date-released: "2026-11-02"
+version: "1.4"
+date-released: "2026-11-10"
 license: Apache-2.0
 repository-code: "https://github.com/elvinhajizada/adaptive-vla-replay"
 abstract: >-
   The released SmolVLA LIBERO checkpoint is taught five new LIBERO-90 tasks in sequence with its own
   fine-tuning recipe, with and without random replay of its own training data at budgets from 0.2%
-  to every frame. Code, launchers, per-run results and the report.
+  to every frame, and with the 2% budget split by task length. Code, launchers, per-run results and
+  the report.
 keywords:
   - vision-language-action
   - continual learning

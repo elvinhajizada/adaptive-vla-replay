@@ -13,7 +13,9 @@
 # Order: Config.new_task_ids = 26, 18, 23, 27, 34. Seeds: buffer and sampler AVLA_BUF_SEED (default
 # 0), training AVLA_SEED (default 1000), as the pilot; replay seeds 2 and 3 change both.
 # Checkpoints at step 100, mid-stage and the last; all slimmed at the end. AVLA_STAGE_PROBES=0 keeps
-# only the just-learned eval (E50: final probes only).
+# only the just-learned eval (E50: final probes only). AVLA_REFRESH=1 draws every task's k frames
+# anew from frames it has not held before instead of keeping PREV_SPEC's (fresh-buffer arm, E59).
+# AVLA_LEARNED_EVAL=0 with AVLA_STAGE_PROBES=0 trains only (training alone peaks at about 9 GB PSS).
 # Slurm settings: a template from the cluster these runs used. Set the partition
 # here or with SBATCH_PARTITION (README, "Running on Slurm").
 #SBATCH --partition=<your-partition>
@@ -38,11 +40,12 @@ assert 2 <= stage <= len(cfg.new_task_ids), stage
 print(cfg.new_task_ids[stage - 1], ",".join(map(str, cfg.new_task_ids[:stage - 1])))
 PY
 )
-LABEL="er-k$K-s$STAGE"
+LABEL="er-k$K-s$STAGE"; BUFFER="--keep"
+[ "${AVLA_REFRESH:-0}" = 1 ] && LABEL="er-k$K-fresh-s$STAGE" && BUFFER="--refresh"
 SPEC="$AVLA_RUNS/replay_specs/$SLURM_JOB_ID-$LABEL.json"
 mkdir -p "$(dirname "$SPEC")"
 STEPS=$(python scripts/replay_spec.py --current "$ENV_ID" --earlier "$EARLIER" --old all --k "$K" \
-    --seed "${AVLA_BUF_SEED:-0}" --keep "$PREV_SPEC" --out "$SPEC" | tail -1)
+    --seed "${AVLA_BUF_SEED:-0}" $BUFFER "$PREV_SPEC" --out "$SPEC" | tail -1)
 MID=$(( STEPS / 2 ))
 echo "== ER stage $STAGE: env $ENV_ID, k $K, earlier $EARLIER, $STEPS steps, from $PREV"
 
@@ -58,8 +61,10 @@ CKPT="$RUN/checkpoints/last/pretrained_model"
 
 export AVLA_SUBGOALS=1
 ID="$SLURM_JOB_ID-$LABEL"
+if [ "${AVLA_LEARNED_EVAL:-1}" = 1 ]; then
 SLURM_JOB_ID="$ID" bash scripts/eval.sh libero_90 "[$ENV_ID]" 50 "$CKPT" > "$RUN/eval-learned.log" 2>&1 \
     || echo "== just-learned eval FAILED (see $RUN/eval-learned.log)"
+fi
 pids=()
 if [ "${AVLA_STAGE_PROBES:-1}" = 1 ]; then
 SLURM_JOB_ID="$ID-earlier" bash scripts/eval.sh libero_90 "[$EARLIER]" 20 "$CKPT" > "$RUN/eval-earlier.log" 2>&1 &

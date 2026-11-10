@@ -1,4 +1,4 @@
-"""Figures for docs/report.md and the README (fig5, fig10 to fig14, fig16), rebuilt from results/*.csv
+"""Figures for docs/report.md and the README (fig5, fig10 to fig14, fig16, fig17), rebuilt from results/*.csv
 only; fig16 is a schematic. PNG for the docs, SVG alongside.
 
 Style: Okabe-Ito categorical slots blue / orange / aqua (colour-blind safe), one-hue blue ramp for
@@ -427,7 +427,67 @@ def fig16_protocol():
     save(fig, "fig16_m2_protocol")
 
 
-FIGURES = (fig5, fig10, fig11, fig12, fig13, fig14, fig16_protocol)
+def _ranks(x):
+    x = np.asarray(x, float)
+    r = np.empty(len(x))
+    r[x.argsort(kind="stable")] = np.arange(len(x))
+    for v in np.unique(x):
+        r[x == v] = r[x == v].mean()
+    return r
+
+
+def _spearman(a, b):
+    return float(np.corrcoef(_ranks(a), _ranks(b))[0, 1])
+
+
+def fig17():
+    """Retention of each Spatial and Goal task against its demo length, after replay and after single
+    fine-tunes (results/task_survival.csv, written by experiments/replay/task_survival.py)."""
+    rows = read("task_survival.csv")
+    length = np.array([float(r["demo_frames"]) for r in rows])
+    suite = [r["suite"] for r in rows]
+    panels = (("replay_mean", "After the five-task replay sequences",
+               "mean over seven runs (0.2%, 2%, every frame; 1 to 3 seeds)"),
+              ("single_mean", "After one fine-tune, no replay",
+               "mean over tasks 26, 27 and task 23 at learning rate 1e-5"))
+    # Selected tasks, labelled in empty space with a leader line: task -> (short label, text x, text y)
+    labels = ({"turn on the stove": ("turn on the stove", 120, 0.95),
+               "open the top drawer and put the bowl inside": ("open top drawer, bowl inside", 196, 0.22),
+               "put the cream cheese in the bowl": ("cream cheese in the bowl", 122, 0.10)},
+              {"turn on the stove": ("turn on the stove", 120, 0.80),
+               "open the top drawer and put the bowl inside": ("open top drawer, bowl inside", 196, 0.30)})
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.9), sharey=True)
+    rng = np.random.default_rng(0)
+    for ax, (key, title, sub), label in zip(axes, panels, labels):
+        y = np.array([float(r[key]) for r in rows])
+        rho = _spearman(length, y)
+        p = (sum(abs(_spearman(length, rng.permutation(y))) >= abs(rho) for _ in range(10000)) + 1) / 10001
+        for s, color, marker, name in (("libero_spatial", BLUE, "o", "LIBERO-Spatial"),
+                                       ("libero_goal", ORANGE, "s", "LIBERO-Goal")):
+            m = np.array([x == s for x in suite])
+            ax.plot(length[m], y[m], linestyle="none", color=color, label=name,
+                    **{**MARK, "marker": marker})
+        for r, x, v in zip(rows, length, y):
+            if r["task"] in label:
+                text, tx, ty = label[r["task"]]
+                ax.annotate(text, (x, v), xytext=(tx, ty), fontsize=8, color=INK2,
+                            ha="left" if tx > x else "right", va="center",
+                            arrowprops=dict(arrowstyle="-", color=MUTED, linewidth=0.8, shrinkB=5))
+        ax.set_title(title, fontsize=10, pad=16)
+        ax.text(0, 1.01, sub, transform=ax.transAxes, fontsize=8, color=MUTED, va="bottom")
+        ax.text(0.98, 0.96, f"Spearman ρ = {rho:+.2f}, p = {p:.3f}", transform=ax.transAxes,
+                ha="right", va="top", fontsize=9, color=INK)
+        ax.set_xlabel("mean demo length (frames)")
+        ax.set_ylim(-0.05, 1.3)
+        ax.axhline(1.0, color=AXIS, linewidth=1, linestyle="--", zorder=0)
+    axes[0].set_ylabel("retention (1 = θ0)")
+    axes[1].legend(loc="upper right", bbox_to_anchor=(1.0, 0.78), fontsize=9)
+    fig.tight_layout(w_pad=2.0)
+    note(fig, axes, -0.06, "One point per task (20 tasks). Spearman ρ with a permutation p over the tasks.")
+    save(fig, "fig17_task_length")
+
+
+FIGURES = (fig5, fig10, fig11, fig12, fig13, fig14, fig16_protocol, fig17)
 
 if __name__ == "__main__":
     names = set(sys.argv[1:])

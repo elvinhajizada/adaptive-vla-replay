@@ -12,6 +12,8 @@
             split in proportion to task length)
 --seed      buffer sample and sampler seed (varies with the run seed)
 --keep      the previous stage's spec: assert every task buffered there has the same frames here
+--refresh   the previous stage's spec: instead of keeping its frames, draw each task's k frames anew
+            from frames it has not held in any earlier stage (fresh-buffer arm, E59). Integer k only.
 Random selection: each task's k frames are a uniform sample without replacement (the random-replay
 condition). Steps = ceil(passes x current frames / current slots per batch): passes count
 current-task samples only. Prints the steps and the buffer ledger; the spec carries both.
@@ -58,7 +60,9 @@ def main() -> None:
     ap.add_argument("--root", default=os.path.join(os.environ["AVLA_DSS"], "data", "libero_all_theta0"))
     ap.add_argument("--out", required=True)
     ap.add_argument("--keep", default="")
+    ap.add_argument("--refresh", default="")
     a = ap.parse_args()
+    assert not (a.keep and a.refresh), "--keep and --refresh exclude each other"
 
     groups = frame_groups(a.root)
     old = [] if a.old == "none" else THETA0_SUITES if a.old == "all" else a.old.split(",")
@@ -76,9 +80,23 @@ def main() -> None:
 
     frac = float(a.k[1:]) / 100 if a.k.startswith("p") else None
     k = None if a.k == "all" or frac is not None else int(a.k)
+    # Refresh: every frame a task held in an earlier stage is excluded (with the undecodable rows,
+    # so each task gets exactly k), and the spec carries the union forward as "used".
+    used: dict = {}
+    if a.refresh:
+        assert k is not None, "--refresh needs an integer k"
+        prev = json.load(open(a.refresh))
+        used = {key: set(v) for key, v in prev.get("used", {}).items()}
+        for key, v in prev["replay"].items():
+            used.setdefault(key, set()).update(v)
     buf = ReplayBuffer(per_task_cap=k, seed=a.seed, per_task_frac=frac)
     for key in keys:                                   # fixed order: the sample depends on the seed only
-        buf.add(key, [i for r in groups[key] for i in r])
+        if a.refresh:
+            pool = [i for r in groups[key] for i in r if i not in used.get(key, ()) and i not in UNDECODABLE]
+            assert len(pool) >= k, f"{key!r}: {len(pool)} unused frames left, need {k}"
+            buf.add(key, pool)
+        else:
+            buf.add(key, [i for r in groups[key] for i in r])
     replay = {key: sorted(i for i in v if i not in UNDECODABLE) for key, v in buf.groups().items()}
     current = [i for r in groups[cur_key] for i in r if i not in UNDECODABLE]
     if a.keep:
@@ -99,9 +117,13 @@ def main() -> None:
             "old_suites": old, "k": a.k, "seed": a.seed, "passes": a.passes, "batch_size": a.batch,
             "mix": a.mix if replay else 0.0, "steps": steps, "ledger": ledger,
             "current": current, "replay": replay}
+    if a.refresh:
+        spec["refresh"] = a.refresh
+        spec["used"] = {key: sorted(v) for key, v in used.items()}
+        assert all(not used.get(key, set()) & set(v) for key, v in replay.items()), "refresh reused a frame"
     with open(a.out, "w") as f:
         json.dump(spec, f)
-    print(json.dumps({k: v for k, v in spec.items() if k not in ("current", "replay")}))
+    print(json.dumps({k: v for k, v in spec.items() if k not in ("current", "replay", "used")}))
     print(steps)
 
 
